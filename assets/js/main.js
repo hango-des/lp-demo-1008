@@ -1,0 +1,311 @@
+/* VietinBank Premium landing v0.2 · không thư viện ngoài */
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const root = document.documentElement;
+
+  /* ---------- Ngôn ngữ VI / EN ---------- */
+  const i18nEls = $$('[data-en]');
+  i18nEls.forEach((el) => { el.dataset.vi = el.innerHTML; });
+  const ARIA = {
+    vi: { menu: 'Mở menu', close: 'Đóng menu', chat: 'Mở hộp chat', top: 'Lên đầu trang' },
+    en: { menu: 'Open menu', close: 'Close menu', chat: 'Open chat', top: 'Back to top' }
+  };
+  const mark = (s) => s.replace(/\[[^\]]+\]/g, '<span class="todo">$&</span>');
+  const setLang = (lang, save = true) => {
+    root.lang = lang;
+    i18nEls.forEach((el) => {
+      const html = lang === 'en' ? mark(el.dataset.en) : el.dataset.vi;
+      if (el.tagName === 'TITLE') document.title = html.replace(/<[^>]+>/g, ''); else el.innerHTML = html;
+    });
+    $$('.lang button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+    const a = ARIA[lang];
+    $('.island .menu-btn')?.setAttribute('aria-label', a.menu);
+    $('#sheet [data-close].menu-btn')?.setAttribute('aria-label', a.close);
+    $('.bubble--chat')?.setAttribute('aria-label', a.chat);
+    $('.bubble--top')?.setAttribute('aria-label', a.top);
+    if (save) { try { localStorage.setItem('vtb-lang', lang); } catch (e) {} }
+    requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+  };
+  $$('.lang button').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang)));
+  if (root.lang === 'en') setLang('en', false);
+
+  /* ---------- Island: thu gọn khi rời hero; nút lên đầu trang ---------- */
+  const island = $('#island');
+  const hero = $('.hero');
+  const toTop = $('.bubble--top');
+  const sentinel = document.createElement('div');
+  sentinel.style.cssText = 'position:absolute;top:0;left:0;height:140px;width:1px;pointer-events:none';
+  document.body.prepend(sentinel);
+  new IntersectionObserver(([e]) => island.classList.toggle('is-compact', !e.isIntersecting)).observe(sentinel);
+  if (hero) new IntersectionObserver(([e]) => toTop.classList.toggle('is-on', !e.isIntersecting), { threshold: 0.15 }).observe(hero);
+  toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }));
+
+  /* ---------- Menu di động ---------- */
+  const sheet = $('#sheet');
+  const openBtn = $('.island .menu-btn');
+  const setSheet = (open) => {
+    if (open) { sheet.hidden = false; requestAnimationFrame(() => sheet.classList.add('is-open')); }
+    else { sheet.classList.remove('is-open'); setTimeout(() => { if (!sheet.classList.contains('is-open')) sheet.hidden = true; }, 500); }
+    openBtn.setAttribute('aria-expanded', String(open));
+    root.style.overflow = open ? 'hidden' : '';
+    if (open) setTimeout(() => $('.menu-btn', sheet).focus(), 60);
+  };
+  openBtn.addEventListener('click', () => setSheet(true));
+  $$('[data-close]', sheet).forEach((el) => el.addEventListener('click', () => setSheet(false)));
+
+  /* ---------- Chat box ---------- */
+  const chat = $('#chat');
+  const chatBtn = $('.bubble--chat');
+  const setChat = (open) => {
+    chat.classList.toggle('is-open', open);
+    chatBtn.setAttribute('aria-expanded', String(open));
+    if (open) setTimeout(() => $('a', chat).focus({ preventScroll: true }), 120);
+  };
+  chatBtn.addEventListener('click', (e) => { e.stopPropagation(); setChat(!chat.classList.contains('is-open')); });
+  $$('[data-chat-close]', chat).forEach((el) => el.addEventListener('click', () => setChat(false)));
+  document.addEventListener('click', (e) => { if (chat.classList.contains('is-open') && !chat.contains(e.target)) setChat(false); });
+  $$('[data-open-chat]').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); setChat(true); }));
+  addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (chat.classList.contains('is-open')) { setChat(false); chatBtn.focus(); }
+    if (sheet.classList.contains('is-open')) { setSheet(false); openBtn.focus(); }
+  });
+
+  /* ---------- Mục menu đang xem ---------- */
+  const links = $$('.nav a');
+  const map = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
+  const spy = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      const a = map.get(e.target.id);
+      if (a && e.isIntersecting) { links.forEach((l) => l.removeAttribute('aria-current')); a.setAttribute('aria-current', 'true'); }
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  map.forEach((_, id) => { const el = document.getElementById(id); el && spy.observe(el); });
+
+  /* ---------- Hiện dần khi cuộn ---------- */
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+  $$('.reveal').forEach((el) => (reduce ? el.classList.add('is-in') : io.observe(el)));
+
+  /* ---------- FAQ: mặc định đóng hết; mở một câu thì các câu khác đóng, chuyển động trượt + mờ dần ---------- */
+  const qas = $$('.qa');
+  const EASE = 'cubic-bezier(.16,1,.3,1)';
+  const qaClose = (d) => {
+    if (!d.open) return;
+    if (reduce) { d.open = false; return; }
+    const sum = $('summary', d);
+    const from = d.offsetHeight, to = sum.offsetHeight + 1;
+    d.classList.add('is-anim', 'is-closing'); d.style.overflow = 'hidden';
+    const an = d.animate([{ height: from + 'px' }, { height: to + 'px' }], { duration: 420, easing: EASE });
+    an.onfinish = () => { d.open = false; d.style.overflow = ''; d.classList.remove('is-anim', 'is-closing'); };
+  };
+  const qaOpen = (d) => {
+    qas.forEach((o) => { if (o !== d) qaClose(o); });
+    const from = d.offsetHeight;
+    d.open = true;
+    if (reduce) return;
+    const to = d.offsetHeight;
+    d.classList.add('is-anim'); d.style.overflow = 'hidden';
+    const an = d.animate([{ height: from + 'px' }, { height: to + 'px' }], { duration: 560, easing: EASE });
+    an.onfinish = () => { d.style.overflow = ''; d.classList.remove('is-anim'); };
+    [...$('.qa__a', d).children].forEach((c, i) => c.animate(
+      [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }],
+      { duration: 520, delay: 80 + i * 70, easing: EASE, fill: 'backwards' }));
+  };
+  qas.forEach((d) => $('summary', d).addEventListener('click', (e) => {
+    e.preventDefault();
+    if (d.classList.contains('is-anim')) return;
+    d.open ? qaClose(d) : qaOpen(d);
+  }));
+
+  /* ---------- Popup chi tiết (mobile: bottom sheet) ---------- */
+  const pop = $('#pop');
+  const popMedia = $('.pop__media', pop);
+  const popBody = $('.pop__body', pop);
+  let popFrom = null;
+  const clean = (html) => html.replace(/\sid="[^"]*"/g, '').replace(/\saria-controls="[^"]*"/g, '');
+  const openPop = ({ img = '', html = '' }) => {
+    popFrom = document.activeElement;
+    popMedia.innerHTML = img ? `<img src="${img}" alt="">` : '';
+    popBody.innerHTML = clean(html);
+    $('.pop__scroll', pop).scrollTop = 0;
+    pop.hidden = false; root.classList.add('pop-lock');
+    requestAnimationFrame(() => requestAnimationFrame(() => pop.classList.add('is-open')));
+    setTimeout(() => $('.pop__x', pop).focus({ preventScroll: true }), 80);
+  };
+  const closePop = () => {
+    if (pop.hidden) return;
+    pop.classList.remove('is-open'); root.classList.remove('pop-lock');
+    setTimeout(() => { if (!pop.classList.contains('is-open')) pop.hidden = true; }, 600);
+    popFrom && popFrom.focus && popFrom.focus({ preventScroll: true });
+  };
+  $$('[data-pop-close]', pop).forEach((el) => el.addEventListener('click', closePop));
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop(); });
+  const isMobile = matchMedia('(max-width: 767px)');
+
+  /* ---------- Carousel ngang: card nào đang ở vị trí xem thì card đó được làm nổi ---------- */
+  const track = (list, items, align, onChange) => {
+    let raf = 0;
+    const pick = () => {
+      raf = 0;
+      if (!isMobile.matches) { items.forEach((c) => c.classList.remove('is-active')); return; }
+      const lr = list.getBoundingClientRect();
+      const pad = parseFloat(getComputedStyle(list).paddingLeft) || 0;
+      const ref = align === 'center' ? lr.left + lr.width / 2 : lr.left + pad;
+      let best = 0, bd = Infinity;
+      items.forEach((c, i) => {
+        const r = c.getBoundingClientRect();
+        const d = Math.abs((align === 'center' ? r.left + r.width / 2 : r.left) - ref);
+        if (d < bd) { bd = d; best = i; }
+      });
+      items.forEach((c, i) => c.classList.toggle('is-active', i === best));
+      onChange && onChange(best);
+    };
+    const req = () => { if (!raf) raf = requestAnimationFrame(pick); };
+    list.addEventListener('scroll', req, { passive: true });
+    addEventListener('resize', req);
+    pick();
+    return pick;
+  };
+  const plist = $('.pillars__list');
+  if (plist) track(plist, $$('.pillar', plist), 'start');
+
+  /* ---------- Đặc quyền theo hạng (mobile): card giữa to và rõ, card bên nhỏ và mờ ---------- */
+  const mcar = $('.mcar');
+  if (mcar) {
+    const cards = $$('.mcard', mcar);
+    const dots = $$('.mdots i');
+    const centerOn = (c, smooth) => mcar.scrollTo({ left: c.offsetLeft - (mcar.clientWidth - c.offsetWidth) / 2, behavior: smooth && !reduce ? 'smooth' : 'auto' });
+    const clampCheck = () => cards.forEach((c) => {
+      const l = $('.mcard__list', c);
+      const over = l.scrollHeight > l.clientHeight + 4;
+      l.classList.toggle('is-clamped', over); c.classList.toggle('has-more', over);
+    });
+    track(mcar, cards, 'center', (i) => dots.forEach((d, k) => d.classList.toggle('is-on', k === i)));
+    if (isMobile.matches) requestAnimationFrame(() => { centerOn(cards[1], false); clampCheck(); });
+    addEventListener('resize', clampCheck);
+    cards.forEach((c) => {
+      c.addEventListener('click', (e) => { if (!c.classList.contains('is-active') && !e.target.closest('.mcard__more')) centerOn(c, true); });
+      $('.mcard__more', c).addEventListener('click', () => openPop({ html: `<div class="mcard mcard--${c.className.match(/mcard--(\w+)/)[1]} is-active in-pop">${c.innerHTML}</div>` }));
+    });
+  }
+
+  /* ---------- Điều kiện (mobile): bấm hạng để xem chi tiết đầy đủ ---------- */
+  $$('.cmp__tier').forEach((b) => b.addEventListener('click', () => {
+    const card = $(`.tcard--${b.dataset.tcard}`);
+    if (card) openPop({ html: `<div class="pop-tcard tcard tcard--${b.dataset.tcard}">${card.innerHTML}</div>` });
+  }));
+
+  /* ---------- Dải rose gold: tắt ánh chạy khi người dùng giảm chuyển động ---------- */
+  if (reduce) $$('.facet svg').forEach((svg) => { try { svg.pauseAnimations(); svg.setCurrentTime(0); } catch (e) {} });
+
+  /* ---------- Bảng đặc quyền: chọn hạng trên mobile ---------- */
+  const mbox = $('.matrix-box');
+  const mtabs = $$('.mtabs button');
+  mtabs.forEach((b) => b.addEventListener('click', () => {
+    mbox.dataset.m = b.dataset.m;
+    mtabs.forEach((o) => o.setAttribute('aria-selected', String(o === b)));
+  }));
+
+  /* ---------- Hành trình di sản ---------- */
+  const stage = $('[data-journey]');
+  if (stage) {
+    const curveBox = $('.journey__curve', stage);
+    const svg = $('svg', stage);
+    const base = $('.curve-base', stage);
+    const glow = $('.curve-glow', stage);
+    const head = $('.curve-head', stage);
+    const nodes = $$('.node', stage);
+    const tiers = $$('.tier', stage);
+    const arts = $$('.jart', stage);
+    const total = base.getTotalLength();
+    const VB = { w: 1200, h: 300 };
+    const mobile = matchMedia('(max-width: 767px)');
+    let lens = [0, 0, 0];
+    let done = false;
+
+    const lenAtX = (x) => {
+      let lo = 0, hi = total;
+      for (let i = 0; i < 30; i++) { const m = (lo + hi) / 2; base.getPointAtLength(m).x < x ? (lo = m) : (hi = m); }
+      return lo;
+    };
+    const toPx = (p, r) => ({ x: (p.x / VB.w) * r.width, y: (p.y / VB.h) * r.height });
+    // Node thẳng hàng với mép trái từng hạng, đường dóng xuống hạng
+    const place = () => {
+      const r = svg.getBoundingClientRect();
+      if (!r.width) return;
+      lens = tiers.map((t, i) => {
+        const tx = t.getBoundingClientRect().left - r.left + 9;
+        const l = lenAtX((tx / r.width) * VB.w);
+        const p = toPx(base.getPointAtLength(l), r);
+        nodes[i].style.left = p.x + 'px';
+        nodes[i].style.top = p.y + 'px';
+        nodes[i].style.setProperty('--drop', Math.max(0, r.height - p.y - 18) + 'px');
+        return l;
+      });
+    };
+    place();
+    new ResizeObserver(place).observe(stage);
+
+    // Mở phần "giá trị nổi bật" của một hạng (desktop: một hạng mở tại một thời điểm)
+    const openTier = (i, only = true) => tiers.forEach((t, k) => {
+      const on = k === i ? true : (only ? false : t.classList.contains('is-open'));
+      t.classList.toggle('is-open', on);
+      $('.tier__toggle', t).setAttribute('aria-expanded', String(on));
+    });
+    const light = (i) => {
+      nodes[i].classList.add('is-lit'); tiers[i].classList.add('is-lit'); arts[i].classList.add('is-lit');
+      if (!mobile.matches) openTier(i);
+    };
+    glow.style.strokeDasharray = total;
+    glow.style.strokeDashoffset = total;
+
+    // Đường cong tự chạy hết, đi qua từng mốc: mốc sáng lên, nội dung hiện rõ, ảnh chìm xuất hiện
+    const run = () => {
+      if (reduce || mobile.matches) { glow.style.strokeDashoffset = 0; [0, 1, 2].forEach(light); done = true; return; }
+      const dur = 3600, t0 = performance.now();
+      const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+      stage.classList.add('is-running');
+      const r = svg.getBoundingClientRect();
+      const lit = [false, false, false];
+      const step = (now) => {
+        const k = Math.min(1, (now - t0) / dur);
+        const L = ease(k) * total;
+        glow.style.strokeDashoffset = total - L;
+        const p = toPx(base.getPointAtLength(L), r);
+        head.style.left = p.x + 'px'; head.style.top = p.y + 'px';
+        lens.forEach((l, i) => { if (!lit[i] && L >= l) { lit[i] = true; light(i); } });
+        if (k < 1) requestAnimationFrame(step);
+        else { stage.classList.remove('is-running'); done = true; }
+      };
+      requestAnimationFrame(step);
+    };
+    new IntersectionObserver(([e], obs) => { if (e.isIntersecting) { obs.disconnect(); run(); } }, { threshold: 0.35 }).observe(stage);
+
+    // Hover / focus: mốc được chọn nổi bật, hai mốc còn lại mờ đi
+    const focus = (i) => {
+      if (!done || mobile.matches) return;
+      if (i !== null) openTier(i);
+      stage.classList.toggle('has-focus', i !== null);
+      [tiers, nodes, arts].forEach((group) => group.forEach((el, k) => el.classList.toggle('is-active', k === i)));
+    };
+    tiers.forEach((t, i) => { t.addEventListener('pointerenter', () => focus(i)); t.addEventListener('focus', () => focus(i)); });
+    // Click: desktop mở hạng được chọn; mobile bật/tắt từng hạng
+    tiers.forEach((t, i) => $('.tier__toggle', t).addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (mobile.matches) {
+        // Mobile: mở popup có ảnh minh hoạ và đầy đủ giá trị nổi bật của hạng
+        const pick = (sel) => ($(sel, t) ? $(sel, t).outerHTML : '');
+        openPop({
+          img: $('img', arts[i]).currentSrc || $('img', arts[i]).src,
+          html: pick('.tier__level') + pick('.tier__name') + pick('.tier__tag') + pick('.tier__desc') + $('.tier__more > div', t).innerHTML
+        });
+      } else { done = true; openTier(i); }
+    }));
+    stage.addEventListener('pointerleave', () => focus(null));
+    stage.addEventListener('focusout', (e) => { if (!stage.contains(e.relatedTarget)) focus(null); });
+  }
+})();
