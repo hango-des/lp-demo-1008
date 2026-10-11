@@ -1,0 +1,27 @@
+/* VietinBank Premium — design tokens (màu chấm trực tiếp từ guideline) */
+@font-face{font-family:"SVN-Gilroy";src:url("fonts/SVN-Gilroy-Light.woff2") format("woff2");font-weight:300;font-display:swap}
+@font-face{font-family:"SVN-Gilroy";src:url("fonts/SVN-Gilroy-Regular.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"SVN-Gilroy";src:url("fonts/SVN-Gilroy-Medium.woff2") format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"SVN-Gilroy";src:url("fonts/SVN-Gilroy-SemiBold.woff2") format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:"SVN-Gilroy";src:url("fonts/SVN-Gilroy-Bold.woff2") format("woff2");font-weight:700;font-display:swap}
+
+:root{
+  /* Màu chủ đạo */
+  --vtb-midnight:#002F54;
+  --vtb-rose:#D3A097;
+  /* Màu bổ trợ */
+  --vtb-royal:#1C4586;
+  --vtb-sky:#3061AE;   /* nhãn guideline ghi #BF8D62 — chờ xác nhận */
+  --vtb-coral:#CE776D;
+  --vtb-pearl:#F1F3F4;
+  /* Gradient stops */
+  --vtb-grad-mid-0:#683431;
+  --vtb-grad-mid-35:#0A1838;
+  --vtb-grad-mid-100:#0060AA;
+  --vtb-grad-rose-bottom:#E9C5BB;
+  --vtb-grad-rose-top:#A56D6A;
+  /* Gradient (không bao giờ dùng radial) */
+  --vtb-gradient-midnight:linear-gradient(25deg,var(--vtb-grad-mid-0) 0%,var(--vtb-grad-mid-35) 35%,var(--vtb-grad-mid-100) 100%);
+  --vtb-gradient-rose:linear-gradient(0deg,var(--vtb-grad-rose-bottom) 0%,var(--vtb-grad-rose-top) 100%);
+  --vtb-font:"SVN-Gilroy",system-ui,sans-serif;
+}

@@ -128,6 +128,7 @@
   let popFrom = null;
   const clean = (html) => html.replace(/\sid="[^"]*"/g, '').replace(/\saria-controls="[^"]*"/g, '');
   const openPop = ({ img = '', html = '' }) => {
+    delete pop.dataset.tier;
     popFrom = document.activeElement;
     popMedia.innerHTML = img ? `<img src="${img}" alt="">` : '';
     popBody.innerHTML = clean(html);
@@ -136,6 +137,7 @@
     requestAnimationFrame(() => requestAnimationFrame(() => pop.classList.add('is-open')));
     setTimeout(() => $('.pop__x', pop).focus({ preventScroll: true }), 80);
   };
+  window.vtbPop = openPop;
   const closePop = () => {
     if (pop.hidden) return;
     pop.classList.remove('is-open'); root.classList.remove('pop-lock');
@@ -214,7 +216,7 @@
   const stage = $('[data-journey]');
   if (stage) {
     const curveBox = $('.journey__curve', stage);
-    const svg = $('svg', stage);
+    const svg = $('.journey__curve > svg:not(.jsilk)', stage);
     const base = $('.curve-base', stage);
     const glow = $('.curve-glow', stage);
     const head = $('.curve-head', stage);
@@ -238,7 +240,7 @@
       const r = svg.getBoundingClientRect();
       if (!r.width) return;
       lens = tiers.map((t, i) => {
-        const tx = t.getBoundingClientRect().left - r.left + 9;
+        const tx = t.getBoundingClientRect().left - r.left;
         const l = lenAtX((tx / r.width) * VB.w);
         const p = toPx(base.getPointAtLength(l), r);
         nodes[i].style.left = p.x + 'px';
@@ -258,7 +260,6 @@
     });
     const light = (i) => {
       nodes[i].classList.add('is-lit'); tiers[i].classList.add('is-lit'); arts[i].classList.add('is-lit');
-      if (!mobile.matches) openTier(i);
     };
     glow.style.strokeDasharray = total;
     glow.style.strokeDashoffset = total;
@@ -288,7 +289,7 @@
     // Hover / focus: mốc được chọn nổi bật, hai mốc còn lại mờ đi
     const focus = (i) => {
       if (!done || mobile.matches) return;
-      if (i !== null) openTier(i);
+      openTier(i === null ? -1 : i);
       stage.classList.toggle('has-focus', i !== null);
       [tiers, nodes, arts].forEach((group) => group.forEach((el, k) => el.classList.toggle('is-active', k === i)));
     };
@@ -308,4 +309,82 @@
     stage.addEventListener('pointerleave', () => focus(null));
     stage.addEventListener('focusout', (e) => { if (!stage.contains(e.relatedTarget)) focus(null); });
   }
+})();
+
+/* v0.7 · hero KV video: dừng khi giảm chuyển động hoặc khi hero khuất khỏi màn hình */
+(()=>{const v=document.querySelector('.hero__media video');if(!v)return;
+if(matchMedia('(max-width:767px)').matches&&v.dataset.mobile){v.poster=v.dataset.mobilePoster||v.poster;v.src=v.dataset.mobile;v.load()}
+const rm=matchMedia('(prefers-reduced-motion: reduce)');
+const sync=()=>{if(rm.matches){v.pause();v.currentTime=0}else v.play().catch(()=>{})};
+rm.addEventListener?.('change',sync);sync();
+new IntersectionObserver(([e])=>{if(rm.matches)return;e.isIntersecting?v.play().catch(()=>{}):v.pause()}).observe(v);})();
+
+/* v0.15 · Hành trình di sản: đường cong luỹ tiến (pathLength=1, vẽ từ điểm đầu), đồng tiền đứng yên theo bố cục mặc định, thẻ mở rộng ngang */
+(()=>{const root=document.querySelector('[data-ascend]');if(!root)return;
+const row=root.querySelector('.ascend__row'),steps=[...root.querySelectorAll('.step')];
+const svg=root.querySelector('.ascend__line'),paths=[...svg.querySelectorAll('path')];
+const nodes=[...root.querySelectorAll('.anode')];
+const mobile=matchMedia('(max-width:767px)');
+paths.forEach(p=>p.setAttribute('pathLength','1'));
+const bez=(p0,p1,p2,p3,t)=>{const u=1-t;return u*u*u*p0+3*u*u*t*p1+3*u*t*t*p2+t*t*t*p3};
+let lastW=0;
+const layout=()=>{if(mobile.matches)return;
+  const W=svg.clientWidth,H=svg.clientHeight;if(!W||!H)return;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const lo=H-72,P=[[0,lo],[W*.36,lo],[W*.64,H*.6],[W,16]];
+  const d=`M${P[0][0]} ${P[0][1]} C ${P[1][0]} ${P[1][1]}, ${P[2][0]} ${P[2][1]}, ${P[3][0]} ${P[3][1]}`;
+  paths.forEach(p=>p.setAttribute('d',d));
+  const cs=getComputedStyle(row),gap=parseFloat(cs.columnGap)||16,cw=(row.clientWidth-2*gap)/3,rowTop=row.offsetTop;
+  nodes.forEach((n,i)=>{const x=i*(cw+gap)+cw/2;let a=0,b=1;
+    for(let k=0;k<30;k++){const m=(a+b)/2;bez(P[0][0],P[1][0],P[2][0],P[3][0],m)<x?a=m:b=m}
+    const y=bez(P[0][1],P[1][1],P[2][1],P[3][1],a);
+    n.style.setProperty('--x',x+'px');n.style.setProperty('--y',y+'px');
+    n.style.setProperty('--drop',Math.max(0,rowTop-y-15)+'px');
+    n.style.setProperty('--nd',(.45+2.1*Math.pow(a,1.15)).toFixed(2)+'s');});
+  lastW=W;};
+const activate=(i)=>{if(mobile.matches)return;
+  root.classList.toggle('has-active',i!==null);root.dataset.active=i===null?'':i;
+  steps.forEach((s,k)=>s.classList.toggle('is-active',k===i));
+  nodes.forEach((n,k)=>{n.classList.toggle('is-on',k===i);n.classList.toggle('is-off',i!==null&&k===1&&i!==1)});};
+steps.forEach((s,i)=>{s.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')activate(i)});s.addEventListener('focus',()=>activate(i));
+  const btn=s.querySelector('.step__toggle');btn&&btn.addEventListener('click',e=>{e.stopPropagation();if(!mobile.matches){activate(i);return}if(window.vtbPop){const t=s.className.match(/step--(\w+)/)[1],img=s.querySelector('.step__media img').getAttribute('src');window.vtbPop({img,html:`<div class="step-pop step--${t}"><span class="step-pop__pat" aria-hidden="true"></span>${s.querySelector('.step__level').outerHTML}${s.querySelector('.step__head').outerHTML}<div class="step-pop__panel">${s.querySelector('.step__more > div').innerHTML}</div></div>`});document.getElementById('pop').dataset.tier=t;return}});});
+steps.forEach(s=>s.addEventListener('click',e=>{if(!mobile.matches||e.target.closest('a,button'))return;const t=s.querySelector('.step__toggle');t&&t.click()}));
+root.addEventListener('pointerleave',()=>activate(null));
+root.addEventListener('focusout',e=>{if(!root.contains(e.relatedTarget))activate(null)});
+new ResizeObserver(()=>{if(svg.clientWidth!==lastW)layout()}).observe(root);
+addEventListener('load',layout);document.fonts&&document.fonts.ready.then(layout);
+mobile.addEventListener&&mobile.addEventListener('change',()=>{activate(null);layout()});
+layout();
+new IntersectionObserver(([e],o)=>{if(e.isIntersecting){o.disconnect();layout();requestAnimationFrame(()=>requestAnimationFrame(()=>root.classList.add('is-in')))}},{threshold:.25}).observe(root);
+})();
+/* mobile: chiều dài đường dọc cho ánh sáng chạy hết */
+(()=>{const a=document.querySelector('[data-ascend]');if(!a)return;const set=()=>a.style.setProperty('--rowh',a.getBoundingClientRect().height+'px');new ResizeObserver(set).observe(a);set();})();
+
+/* v0.14 · Điều kiện (mobile): card trượt ngang + chấm; nút "Xem điều kiện" cuộn tới và trượt đúng hạng */
+(()=>{const grid=document.querySelector('.conditions__grid');if(!grid)return;
+const cards=[...grid.querySelectorAll('.tcard')],dots=[...document.querySelectorAll('.cdots i')],mq=matchMedia('(max-width:767px)');
+const red=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const center=(c,smooth)=>grid.scrollTo({left:c.offsetLeft-(grid.clientWidth-c.offsetWidth)/2,behavior:smooth&&!red?'smooth':'auto'});
+let raf=0;const pick=()=>{raf=0;if(!mq.matches){cards.forEach(c=>c.classList.remove('is-cur'));return}
+  const r=grid.getBoundingClientRect(),m=r.left+r.width/2;let b=0,bd=1e9;
+  cards.forEach((c,i)=>{const q=c.getBoundingClientRect(),d=Math.abs(q.left+q.width/2-m);if(d<bd){bd=d;b=i}});
+  cards.forEach((c,i)=>c.classList.toggle('is-cur',i===b));dots.forEach((d,i)=>d.classList.toggle('is-on',i===b))};
+grid.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(pick)},{passive:true});addEventListener('resize',pick);
+cards.forEach(c=>c.addEventListener('click',()=>{if(mq.matches&&!c.classList.contains('is-cur'))center(c,true)}));
+requestAnimationFrame(()=>{if(mq.matches)center(cards[0],false);pick()});
+const sec=document.getElementById('dieu-kien');const order=['plat','dia','eli'];
+const go=(t)=>{const c=grid.querySelector(`.tcard[data-tier="${t}"]`);if(!c)return;
+  const hdr=72;const top=(mq.matches?grid:sec).getBoundingClientRect().top+scrollY-hdr-(mq.matches?120:24);
+  scrollTo({top,behavior:red?'auto':'smooth'});
+  setTimeout(()=>{if(mq.matches)center(c,true);cards.forEach(o=>o.classList.remove('is-focus'));void c.offsetWidth;c.classList.add('is-focus');setTimeout(()=>c.classList.remove('is-focus'),2600)},red?0:700)};
+const closeP=()=>{const p=document.getElementById('pop');if(p&&!p.hidden){p.querySelector('.pop__x').click();return 420}return 0};
+const goPriv=(t)=>{const w=document.querySelector('.matrix-wrap');if(!w)return;const idx=order.indexOf(t);
+  scrollTo({top:w.getBoundingClientRect().top+scrollY-96,behavior:red?'auto':'smooth'});
+  const box=document.querySelector('.matrix-box');if(box&&idx>-1){box.dataset.m=idx;document.querySelectorAll('.mtabs button').forEach(o=>o.setAttribute('aria-selected',String(+o.dataset.m===idx)))}
+  setTimeout(()=>{const car=document.querySelector('.mcar'),c=car&&car.querySelector(`.mcard--${t}`);if(mq.matches&&c)car.scrollTo({left:c.offsetLeft-(car.clientWidth-c.offsetWidth)/2,behavior:red?'auto':'smooth'})},red?0:700)};
+document.addEventListener('click',e=>{const pb=e.target.closest('[data-goto-priv]');
+  if(pb){e.preventDefault();e.stopPropagation();const t=pb.dataset.gotoPriv;setTimeout(()=>goPriv(t),closeP());return}
+  const b=e.target.closest('[data-goto-cond]');if(!b)return;e.preventDefault();e.stopPropagation();const wait=closeP();let t=b.dataset.gotoCond;
+  setTimeout(()=>{
+  if(!t){if(!mq.matches){scrollTo({top:sec.getBoundingClientRect().top+scrollY-96,behavior:red?'auto':'smooth'});setTimeout(()=>cards.forEach((c,i)=>setTimeout(()=>{c.classList.remove('is-focus');void c.offsetWidth;c.classList.add('is-focus');setTimeout(()=>c.classList.remove('is-focus'),2600)},i*180)),red?0:700);return}t='plat'}go(t)},wait)},true);
 })();
