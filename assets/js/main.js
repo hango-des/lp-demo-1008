@@ -1,3 +1,4 @@
+if(document.documentElement.classList.contains('figma-static'))document.querySelectorAll('img[loading="lazy"]').forEach(i=>{i.loading='eager'});
 /* VietinBank Premium landing v0.2 · không thư viện ngoài */
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
