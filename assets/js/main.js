@@ -84,6 +84,10 @@ if(document.documentElement.classList.contains('figma-static'))document.querySel
     });
   }, { rootMargin: '-45% 0px -50% 0px' });
   map.forEach((_, id) => { const el = document.getElementById(id); el && spy.observe(el); });
+  /* v0.20: đang ở banner/phần mở đầu thì không gạch chân mục nào */
+  const clear = () => links.forEach((l) => l.removeAttribute('aria-current'));
+  const intro = new IntersectionObserver((entries) => { entries.forEach((e) => { if (e.isIntersecting) clear(); }); }, { rootMargin: '-45% 0px -50% 0px' });
+  ['.hero', '.pillars', '.exclusive'].forEach((q) => { const el = document.querySelector(q); el && intro.observe(el); });
 
   /* ---------- Hiện dần khi cuộn ---------- */
   const io = new IntersectionObserver((entries) => {
@@ -176,26 +180,6 @@ if(document.documentElement.classList.contains('figma-static'))document.querySel
   const plist = $('.pillars__list');
   if (plist) track(plist, $$('.pillar', plist), 'start');
 
-  /* ---------- Đặc quyền theo hạng (mobile): card giữa to và rõ, card bên nhỏ và mờ ---------- */
-  const mcar = $('.mcar');
-  if (mcar) {
-    const cards = $$('.mcard', mcar);
-    const dots = $$('.mdots i');
-    const centerOn = (c, smooth) => mcar.scrollTo({ left: c.offsetLeft - (mcar.clientWidth - c.offsetWidth) / 2, behavior: smooth && !reduce ? 'smooth' : 'auto' });
-    const clampCheck = () => cards.forEach((c) => {
-      const l = $('.mcard__list', c);
-      const over = l.scrollHeight > l.clientHeight + 4;
-      l.classList.toggle('is-clamped', over); c.classList.toggle('has-more', over);
-    });
-    track(mcar, cards, 'center', (i) => dots.forEach((d, k) => d.classList.toggle('is-on', k === i)));
-    if (isMobile.matches) requestAnimationFrame(() => { centerOn(cards[1], false); clampCheck(); });
-    addEventListener('resize', clampCheck);
-    cards.forEach((c) => {
-      c.addEventListener('click', (e) => { if (!c.classList.contains('is-active') && !e.target.closest('.mcard__more')) centerOn(c, true); });
-      $('.mcard__more', c).addEventListener('click', () => openPop({ html: `<div class="mcard mcard--${c.className.match(/mcard--(\w+)/)[1]} is-active in-pop">${c.innerHTML}</div>` }));
-    });
-  }
-
   /* ---------- Điều kiện (mobile): bấm hạng để xem chi tiết đầy đủ ---------- */
   $$('.cmp__tier').forEach((b) => b.addEventListener('click', () => {
     const card = $(`.tcard--${b.dataset.tcard}`);
@@ -204,14 +188,6 @@ if(document.documentElement.classList.contains('figma-static'))document.querySel
 
   /* ---------- Dải rose gold: tắt ánh chạy khi người dùng giảm chuyển động ---------- */
   if (reduce) $$('.facet svg').forEach((svg) => { try { svg.pauseAnimations(); svg.setCurrentTime(0); } catch (e) {} });
-
-  /* ---------- Bảng đặc quyền: chọn hạng trên mobile ---------- */
-  const mbox = $('.matrix-box');
-  const mtabs = $$('.mtabs button');
-  mtabs.forEach((b) => b.addEventListener('click', () => {
-    mbox.dataset.m = b.dataset.m;
-    mtabs.forEach((o) => o.setAttribute('aria-selected', String(o === b)));
-  }));
 
   /* ---------- Hành trình di sản ---------- */
   const stage = $('[data-journey]');
@@ -347,11 +323,15 @@ const activate=(i)=>{if(mobile.matches)return;
   root.classList.toggle('has-active',i!==null);root.dataset.active=i===null?'':i;
   steps.forEach((s,k)=>s.classList.toggle('is-active',k===i));
   nodes.forEach((n,k)=>{n.classList.toggle('is-on',k===i);n.classList.toggle('is-off',i!==null&&k===1&&i!==1)});};
-steps.forEach((s,i)=>{s.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')activate(i)});s.addEventListener('focus',()=>activate(i));
+/* v0.20: hover có độ trễ nhỏ + khoá trong lúc thẻ đang giãn, tránh nhảy qua lại khi ranh giới thẻ dịch chuyển dưới con trỏ */
+let cur=null,tIn=0,tOut=0,lockUntil=0;
+const want=(i)=>{clearTimeout(tOut);clearTimeout(tIn);if(i===cur)return;const now=performance.now(),wait=Math.max(cur===null?70:140,lockUntil-now);tIn=setTimeout(()=>{cur=i;lockUntil=performance.now()+650;activate(i)},wait)};
+steps.forEach((s,i)=>{s.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')want(i)});s.addEventListener('focus',()=>{cur=i;activate(i)});
   const btn=s.querySelector('.step__toggle');btn&&btn.addEventListener('click',e=>{e.stopPropagation();if(!mobile.matches){activate(i);return}if(window.vtbPop){const t=s.className.match(/step--(\w+)/)[1],img=s.querySelector('.step__media img').getAttribute('src');window.vtbPop({img,html:`<div class="step-pop step--${t}"><span class="step-pop__pat" aria-hidden="true"></span>${s.querySelector('.step__level').outerHTML}${s.querySelector('.step__head').outerHTML}<div class="step-pop__panel">${s.querySelector('.step__more > div').innerHTML}</div></div>`});document.getElementById('pop').dataset.tier=t;return}});});
 steps.forEach(s=>s.addEventListener('click',e=>{if(!mobile.matches||e.target.closest('a,button'))return;const t=s.querySelector('.step__toggle');t&&t.click()}));
-root.addEventListener('pointerleave',()=>activate(null));
-root.addEventListener('focusout',e=>{if(!root.contains(e.relatedTarget))activate(null)});
+root.addEventListener('pointerleave',()=>{clearTimeout(tIn);clearTimeout(tOut);tOut=setTimeout(()=>{cur=null;lockUntil=0;activate(null)},180)});
+root.addEventListener('pointerenter',()=>clearTimeout(tOut));
+root.addEventListener('focusout',e=>{if(!root.contains(e.relatedTarget)){cur=null;activate(null)}});
 new ResizeObserver(()=>{if(svg.clientWidth!==lastW)layout()}).observe(root);
 addEventListener('load',layout);document.fonts&&document.fonts.ready.then(layout);
 mobile.addEventListener&&mobile.addEventListener('change',()=>{activate(null);layout()});
@@ -379,13 +359,52 @@ const go=(t)=>{const c=grid.querySelector(`.tcard[data-tier="${t}"]`);if(!c)retu
   scrollTo({top,behavior:red?'auto':'smooth'});
   setTimeout(()=>{if(mq.matches)center(c,true);cards.forEach(o=>o.classList.remove('is-focus'));void c.offsetWidth;c.classList.add('is-focus');setTimeout(()=>c.classList.remove('is-focus'),2600)},red?0:700)};
 const closeP=()=>{const p=document.getElementById('pop');if(p&&!p.hidden){p.querySelector('.pop__x').click();return 420}return 0};
-const goPriv=(t)=>{const w=document.querySelector('.matrix-wrap');if(!w)return;const idx=order.indexOf(t);
-  scrollTo({top:w.getBoundingClientRect().top+scrollY-96,behavior:red?'auto':'smooth'});
-  const box=document.querySelector('.matrix-box');if(box&&idx>-1){box.dataset.m=idx;document.querySelectorAll('.mtabs button').forEach(o=>o.setAttribute('aria-selected',String(+o.dataset.m===idx)))}
-  setTimeout(()=>{const car=document.querySelector('.mcar'),c=car&&car.querySelector(`.mcard--${t}`);if(mq.matches&&c)car.scrollTo({left:c.offsetLeft-(car.clientWidth-c.offsetWidth)/2,behavior:red?'auto':'smooth'})},red?0:700)};
+const goPriv=(t)=>{const w=document.querySelector('[data-pvx]');if(!w)return;
+  scrollTo({top:w.getBoundingClientRect().top+scrollY-110,behavior:red?'auto':'smooth'});
+  if(order.indexOf(t)>-1){clearTimeout(w._ft);w.dataset.focus=t;w._ft=setTimeout(()=>delete w.dataset.focus,3200)}};
 document.addEventListener('click',e=>{const pb=e.target.closest('[data-goto-priv]');
   if(pb){e.preventDefault();e.stopPropagation();const t=pb.dataset.gotoPriv;setTimeout(()=>goPriv(t),closeP());return}
   const b=e.target.closest('[data-goto-cond]');if(!b)return;e.preventDefault();e.stopPropagation();const wait=closeP();let t=b.dataset.gotoCond;
   setTimeout(()=>{
   if(!t){if(!mq.matches){scrollTo({top:sec.getBoundingClientRect().top+scrollY-96,behavior:red?'auto':'smooth'});setTimeout(()=>cards.forEach((c,i)=>setTimeout(()=>{c.classList.remove('is-focus');void c.offsetWidth;c.classList.add('is-focus');setTimeout(()=>c.classList.remove('is-focus'),2600)},i*180)),red?0:700);return}t='plat'}go(t)},wait)},true);
 })();
+
+/* v0.21 · Đặc quyền: chọn từng nhóm đặc quyền (tab), vuốt ngang trên mobile */
+(()=>{const root=document.querySelector('[data-pvx]');if(!root)return;
+const tabs=[...root.querySelectorAll('.pvx__tab')],panels=[...root.querySelectorAll('.pvx__panel')],nav=root.querySelector('.pvx__nav');
+let cur=0;const red=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const center=(t,smooth)=>{if(nav.scrollWidth<=nav.clientWidth+2)return;const nr=nav.getBoundingClientRect(),tr=t.getBoundingClientRect();nav.scrollTo({left:nav.scrollLeft+(tr.left+tr.width/2)-(nr.left+nr.width/2),behavior:smooth?'smooth':'auto'})};
+const set=(i,focus)=>{i=(i+tabs.length)%tabs.length;if(i===cur)return;cur=i;
+  tabs.forEach((t,k)=>{const on=k===i;t.setAttribute('aria-selected',String(on));t.tabIndex=on?0:-1});
+  panels.forEach((p,k)=>{const on=k===i;p.classList.toggle('is-on',on);if(on){p.removeAttribute('aria-hidden');p.inert=false}else{p.setAttribute('aria-hidden','true');p.inert=true}});
+  const t=tabs[i];if(focus)t.focus({preventScroll:true});
+  center(t,!red)};
+tabs.forEach((t,i)=>t.addEventListener('click',()=>set(i)));
+nav.addEventListener('keydown',e=>{const k={ArrowDown:1,ArrowRight:1,ArrowUp:-1,ArrowLeft:-1}[e.key];if(k){e.preventDefault();set(cur+k,true)}else if(e.key==='Home'){e.preventDefault();set(0,true)}else if(e.key==='End'){e.preventDefault();set(tabs.length-1,true)}});
+const stage=root.querySelector('.pvx__stage');let x0=null,y0=0;
+stage.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+stage.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;x0=null;if(Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.4)set(cur+(dx<0?1:-1))},{passive:true});
+})();
+
+/* v0.21 · Dành riêng KHƯT (mobile): chấm trang cho slider */
+(()=>{const g=document.querySelector('.exclusive__grid'),dots=[...document.querySelectorAll('.xdots i')];if(!g||!dots.length)return;
+const cards=[...g.querySelectorAll('.xcard')];let raf=0;
+const pick=()=>{raf=0;const L=g.getBoundingClientRect().left+parseFloat(getComputedStyle(g).paddingLeft||0);let b=0,bd=1e9;cards.forEach((c,i)=>{const d=Math.abs(c.getBoundingClientRect().left-L);if(d<bd){bd=d;b=i}});
+  if(g.scrollLeft+g.clientWidth>=g.scrollWidth-4)b=cards.length-1;dots.forEach((d,i)=>d.classList.toggle('is-on',i===b))};
+g.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(pick)},{passive:true});})();
+
+/* v0.24 · Sản phẩm (mobile): slide thẻ, thẻ ở giữa nổi rõ + chấm trang */
+(()=>{const g=document.querySelector('.products .cards'),dots=[...document.querySelectorAll('.pdots i')];if(!g)return;
+const cards=[...g.querySelectorAll('.ccard')],mq=matchMedia('(max-width:767px)');let raf=0;
+const pick=()=>{raf=0;if(!mq.matches){cards.forEach(c=>c.classList.remove('is-cur'));return}
+  const r=g.getBoundingClientRect(),mid=r.left+r.width/2;let b=0,bd=1e9;
+  cards.forEach((c,i)=>{const cr=c.getBoundingClientRect(),d=Math.abs(cr.left+cr.width/2-mid);if(d<bd){bd=d;b=i}});
+  cards.forEach((c,i)=>c.classList.toggle('is-cur',i===b));dots.forEach((d,i)=>d.classList.toggle('is-on',i===b))};
+g.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(pick)},{passive:true});addEventListener('resize',pick);
+cards.forEach(c=>c.addEventListener('click',e=>{if(mq.matches&&!c.classList.contains('is-cur')&&!e.target.closest('a')){g.scrollTo({left:c.offsetLeft-(g.clientWidth-c.offsetWidth)/2,behavior:'smooth'})}}));
+requestAnimationFrame(pick);})();
+
+/* v0.28 · Mobile: ẩn nút chat/lên đầu trang khi CTA hero đang hiện, tránh che nút */
+(()=>{const cta=document.querySelector('.hero__cta'),dock=document.querySelector('.dock');if(!cta||!dock||!('IntersectionObserver' in window))return;
+const mq=matchMedia('(max-width:767px)');
+new IntersectionObserver(([e])=>{dock.classList.toggle('is-tucked',mq.matches&&e.isIntersecting&&!dock.querySelector('.chat.is-open'))},{threshold:0}).observe(cta);})();
