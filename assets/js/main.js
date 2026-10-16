@@ -325,7 +325,7 @@ const activate=(i)=>{if(mobile.matches)return;
   nodes.forEach((n,k)=>{n.classList.toggle('is-on',k===i);n.classList.toggle('is-off',i!==null&&k===1&&i!==1)});};
 /* v0.20: hover có độ trễ nhỏ + khoá trong lúc thẻ đang giãn, tránh nhảy qua lại khi ranh giới thẻ dịch chuyển dưới con trỏ */
 let cur=null,tIn=0,tOut=0,lockUntil=0;
-const want=(i)=>{clearTimeout(tOut);clearTimeout(tIn);if(i===cur)return;const now=performance.now(),wait=Math.max(cur===null?70:140,lockUntil-now);tIn=setTimeout(()=>{cur=i;lockUntil=performance.now()+650;activate(i)},wait)};
+const want=(i)=>{clearTimeout(tOut);clearTimeout(tIn);if(i===cur)return;const now=performance.now(),wait=Math.max(cur===null?60:110,lockUntil-now);tIn=setTimeout(()=>{cur=i;lockUntil=performance.now()+260;activate(i)},wait)};
 steps.forEach((s,i)=>{s.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')want(i)});s.addEventListener('focus',()=>{cur=i;activate(i)});
   const btn=s.querySelector('.step__toggle');btn&&btn.addEventListener('click',e=>{e.stopPropagation();if(!mobile.matches){activate(i);return}if(window.vtbPop){const t=s.className.match(/step--(\w+)/)[1],img=s.querySelector('.step__media img').getAttribute('src');window.vtbPop({img,html:`<div class="step-pop step--${t}"><span class="step-pop__pat" aria-hidden="true"></span>${s.querySelector('.step__level').outerHTML}${s.querySelector('.step__head').outerHTML}<div class="step-pop__panel">${s.querySelector('.step__more > div').innerHTML}</div></div>`});document.getElementById('pop').dataset.tier=t;return}});});
 steps.forEach(s=>s.addEventListener('click',e=>{if(!mobile.matches||e.target.closest('a,button'))return;const t=s.querySelector('.step__toggle');t&&t.click()}));
@@ -408,3 +408,39 @@ requestAnimationFrame(pick);})();
 (()=>{const cta=document.querySelector('.hero__cta'),dock=document.querySelector('.dock');if(!cta||!dock||!('IntersectionObserver' in window))return;
 const mq=matchMedia('(max-width:767px)');
 new IntersectionObserver(([e])=>{dock.classList.toggle('is-tucked',mq.matches&&e.isIntersecting&&!dock.querySelector('.chat.is-open'))},{threshold:0}).observe(cta);})();
+
+/* v0.29 · Hành trình (desktop): đo trước kích thước thẻ ở trạng thái thu/giãn để cố định bề ngang chữ và khung ảnh */
+(()=>{const root=document.querySelector('.ascend');if(!root)return;const steps=[...root.querySelectorAll('.step')];if(steps.length<2)return;
+const mq=matchMedia('(min-width:768px)');
+const measure=()=>{if(!mq.matches){['--aw','--mw','--tw'].forEach(v=>root.style.removeProperty(v));return}
+  const saved=steps.map(s=>s.classList.contains('is-active')),had=root.classList.contains('has-active');
+  root.classList.add('is-measuring');
+  steps.forEach(s=>s.classList.remove('is-active'));root.classList.remove('has-active');
+  const wi=steps[0].getBoundingClientRect().width;
+  steps[1].classList.add('is-active');root.classList.add('has-active');
+  const aw=steps[1].getBoundingClientRect().width,cw=steps[0].getBoundingClientRect().width;
+  steps[1].classList.remove('is-active');root.classList.toggle('has-active',had);
+  steps.forEach((s,i)=>s.classList.toggle('is-active',saved[i]));
+  const body=steps[0].querySelector('.step__body'),cs=getComputedStyle(body),pad=parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight);
+  root.style.setProperty('--aw',aw+'px');
+  root.style.setProperty('--mw',Math.ceil(Math.max(aw*.62,wi,cw))+'px');
+  root.style.setProperty('--tw',Math.floor(Math.min(cw,400)-pad)+'px');root.style.setProperty('--twi',Math.floor(Math.min(wi,400)-pad)+'px');
+  void root.offsetWidth;root.classList.remove('is-measuring')};
+let t=0;addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(measure,120)});
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(measure);measure();})();
+
+/* v0.29 · Tạm dừng animation lặp ở các section ngoài màn hình (đỡ tốn GPU/CPU, cuộn & hover mượt hơn) */
+(()=>{if(!('IntersectionObserver' in window))return;
+const io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('is-offscreen',!e.isIntersecting)),{rootMargin:'120px 0px'});
+document.querySelectorAll('main > section, .hero, footer, .silk').forEach(s=>io.observe(s));})();
+
+/* v0.30 · Chèn viền SVG "tô sáng dần" cho 3 thẻ hạng */
+(()=>{const steps=document.querySelectorAll('.ascend .step');const NS='http://www.w3.org/2000/svg';
+const pal={plat:['#FFFFFF','#E6EAF0','#9AA4B4'],dia:['#F4FEFF','#C2F0F1','#4FB3BC'],eli:['#FFF4F0','#F0C3BA','#B5635F']};
+steps.forEach((s,i)=>{const f=s.querySelector('.step__frame');if(!f||f.querySelector('.step__trace'))return;
+  const k=s.classList.contains('step--eli')?'eli':s.classList.contains('step--dia')?'dia':'plat',c=pal[k],id='trg'+i;
+  const svg=document.createElementNS(NS,'svg');svg.setAttribute('class','step__trace');svg.setAttribute('aria-hidden','true');
+  svg.innerHTML=`<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset=".45" stop-color="${c[1]}"/><stop offset="1" stop-color="${c[2]}"/></linearGradient></defs>`+
+   `<rect x="0" y="0" width="100%" height="100%" rx="18" ry="18" pathLength="1" stroke="url(#${id})"/>`+
+   `<rect class="tr-tip" x="0" y="0" width="100%" height="100%" rx="18" ry="18" pathLength="1" stroke="#FFFFFF"/>`;
+  f.appendChild(svg)});})();
