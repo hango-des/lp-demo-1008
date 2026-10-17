@@ -2110,3 +2110,7 @@ p,li,small{text-wrap:pretty}
 /* v0.32b · Hero: đáy chuyển dần về navy thương hiệu (--bg) để nối liền các section dưới, không phủ lên khối kính + logo */
 .hero::before{background:linear-gradient(90deg,rgba(10,24,64,.82) 0%,rgba(10,24,64,.58) 26%,rgba(10,24,64,.12) 48%,rgba(10,24,64,0) 60%),linear-gradient(0deg,var(--bg) 0%,rgba(10,26,62,.9) 7%,rgba(10,26,62,.6) 15%,rgba(10,26,62,.22) 25%,rgba(10,26,62,0) 34%)}
 @media (min-width:1600px){.hero::before{background:linear-gradient(90deg,rgba(10,24,64,.82) 0%,rgba(10,24,64,.58) 26%,rgba(10,24,64,.12) 48%,rgba(10,24,64,0) 60%),linear-gradient(0deg,var(--bg) 0%,rgba(10,26,62,.92) 9%,rgba(10,26,62,.62) 18%,rgba(10,26,62,.24) 28%,rgba(10,26,62,0) 38%)}}
+
+/* v0.33 · Icon ứng dụng VietinBank iPay thay ô QR */
+.app__icon{width:96px;height:96px;border-radius:22px;display:block;object-fit:cover;box-shadow:0 12px 28px -14px rgba(0,0,0,.6)}
+@media (max-width:767px){.app{grid-template-columns:auto 1fr;align-items:center}.app__icon{width:56px;height:56px;border-radius:13px}.app .stores{grid-column:1 / -1}}
