@@ -2114,3 +2114,10 @@ p,li,small{text-wrap:pretty}
 /* v0.33 · Icon ứng dụng VietinBank iPay thay ô QR */
 .app__icon{width:96px;height:96px;border-radius:22px;display:block;object-fit:cover;box-shadow:0 12px 28px -14px rgba(0,0,0,.6)}
 @media (max-width:767px){.app{grid-template-columns:auto 1fr;align-items:center}.app__icon{width:56px;height:56px;border-radius:13px}.app .stores{grid-column:1 / -1}}
+
+/* v0.36 · Ghi chú dưới bảng Điều kiện: rộng hơn (desktop/tablet), vẫn chừa khoảng cách với CTA */
+@media (min-width:768px){
+  .conditions__foot{flex-wrap:nowrap;gap:20px 96px}
+  .conditions__note{max-width:880px;flex:1 1 auto}
+  .conditions__foot .link-arrow{flex:none;white-space:nowrap}
+}
