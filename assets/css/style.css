@@ -2121,3 +2121,29 @@ p,li,small{text-wrap:pretty}
   .conditions__note{max-width:880px;flex:1 1 auto}
   .conditions__foot .link-arrow{flex:none;white-space:nowrap}
 }
+
+/* v0.37 · Đặc quyền: nhóm chỉ có 2 hạng (Sức khoẻ, Tư vấn tài chính) chia 2 cột */
+@media (min-width:768px){
+  .pvx__tiers:has(> .pvx__tier:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* v0.37 · Quyền lợi nhiều dòng trong box hạng: mỗi dòng một ý, có chấm màu hạng */
+.pvx__v i{display:block;position:relative;padding-left:14px;font-style:normal}
+.pvx__v i + i{margin-top:6px}
+.pvx__v i::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;border-radius:50%;background:var(--tc,#F1F3F4);opacity:.85}
+.pvx__tier--plat .pvx__v i::before{background:#E6EAF0}
+.pvx__tier--dia .pvx__v i::before{background:#9FE3E6}
+.pvx__tier--eli .pvx__v i::before{background:#F0C3BA}
+
+/* v0.40 · Đặc quyền (desktop): tên nhóm và tiêu đề không xuống dòng ở bản VI */
+@media (min-width:1101px){
+  .pvx{grid-template-columns:minmax(260px,340px) minmax(0,1fr)}
+  .pvx__name{white-space:nowrap}
+  .pvx__cap{max-width:none}
+  .pvx__cap h3{white-space:nowrap}
+  .pvx__cap p{max-width:34rem}
+}
+
+/* v0.42 · Hotline KHƯT: dòng phụ số quốc tế */
+.citem__note{display:block;margin-top:4px;font-size:.875rem;color:var(--text-3)}
+.citem .citem__note a,.citem--hl .citem__note a{display:inline;margin:0;font-size:.875rem;font-weight:600;color:var(--text-2)}
+.citem .citem__note a:hover{color:var(--vtb-rose)}
