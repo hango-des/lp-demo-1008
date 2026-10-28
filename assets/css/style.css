@@ -2200,3 +2200,64 @@ html[lang="en"] .hero h1.hero__kvtitle{font-size:clamp(1.75rem,3.5vw,3.5rem)}
   html[lang="en"] .hero h1.hero__kvtitle{font-size:1.625rem}
   .hero__inner.hero__inner--kv{margin-top:-40px}
 }
+
+/* v0.47 · Hero: khối chữ không lấn vào khối kính KV. Ảnh canh giữa nên mép trái khối kính ≈ giữa màn hình;
+   bề ngang dành cho chữ = 50vw − lề trái container − 48px, cỡ tagline co theo bề ngang đó */
+@media (min-width:768px){
+  .hero{--kv-avail:calc(50vw - max(var(--gutter), (100vw - var(--container)) / 2) - 48px)}
+  .hero__media img{object-position:50% 50%}
+  .hero__inner.hero__inner--kv{width:min(100% - 2*var(--gutter),var(--container))}
+  .hero__inner--kv > *,.hero__inner--kv > h1.hero__kvtitle{max-width:min(560px,var(--kv-avail))}
+  .hero h1.hero__kvtitle{font-size:min(4.375rem,calc(var(--kv-avail) / 9.8))}
+  html[lang="en"] .hero h1.hero__kvtitle{font-size:min(3.5rem,calc(var(--kv-avail) / 12.6))}
+  .hero__tiers{font-size:min(1.125rem,calc(var(--kv-avail) / 30))}
+  .hero__inner--kv .hero__lead{font-size:min(1.25rem,calc(var(--kv-avail) / 26))}
+}
+/* Tablet (768–1180px): không đủ chỗ đặt chữ cạnh khối kính → KV nguyên khung ở trên, chữ ở dưới */
+@media (min-width:768px) and (max-width:1180px){
+  .hero{min-height:0;justify-content:flex-start}
+  .hero__media{position:relative;inset:auto;height:auto}
+  .hero__media picture{position:relative;inset:auto;left:0;width:100%;height:auto;display:block}
+  .hero__media img{height:auto;aspect-ratio:2400/1356;object-fit:cover;object-position:50% 50%;-webkit-mask-image:linear-gradient(180deg,#000 78%,transparent);mask-image:linear-gradient(180deg,#000 78%,transparent)}
+  .hero__inner.hero__inner--kv{margin-top:-24px;padding-top:0;padding-bottom:clamp(110px,14vw,150px)}
+  .hero__inner--kv > *,.hero__inner--kv > h1.hero__kvtitle{max-width:640px}
+  .hero h1.hero__kvtitle{font-size:clamp(2.5rem,5.4vw,3.5rem)}
+  html[lang="en"] .hero h1.hero__kvtitle{font-size:clamp(2rem,4.2vw,2.75rem)}
+  .hero__tiers{font-size:.9375rem}
+  .hero__inner--kv .hero__lead{font-size:1.1875rem}
+}
+
+/* v0.48 · Hero desktop màn hình rộng/thấp (tỉ lệ > KV 2448:1383): KV thu nhỏ theo chiều cao, hiện trọn
+   khối kính (không cắt trên/dưới), neo phải; phần trống bên trái nối bằng dải màu lấy từ mép trái KV */
+@media (min-width:1181px) and (min-aspect-ratio:2448/1383){
+  .hero{background:linear-gradient(180deg,#061330 0%,#061738 8%,#091D43 16%,#0E244C 24%,#152B55 32%,#203360 40%,#293663 46%,#2E3963 49%,#313962 50.5%,#333A61 51.5%,#363A60 53%,#3B3556 58%,#091836 66%,#061530 76%,#050E26 88%,#030A1D 100%)}
+  .hero__media picture{left:auto;right:0;top:0;bottom:0;width:auto;height:100%;aspect-ratio:2448/1383}
+  .hero__media img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 12%);mask-image:linear-gradient(90deg,transparent 0%,#000 12%)}
+  .hero{--kv-avail:calc(100vw - 87.35dvh - max(var(--gutter), (100vw - var(--container)) / 2) - 48px)}
+}
+
+/* v0.49 · Hero desktop: tagline nhỏ hơn; KV (màn hình rộng) dịch sang trái để mép phải khối kính thẳng mép phải lưới nội dung */
+@media (min-width:768px){
+  .hero h1.hero__kvtitle{font-size:min(3.75rem,calc(var(--kv-avail) / 11))}
+  html[lang="en"] .hero h1.hero__kvtitle{font-size:min(3rem,calc(var(--kv-avail) / 13.5))}
+}
+@media (min-width:1181px) and (min-aspect-ratio:2448/1383){
+  .hero{--kv-left:max(var(--gutter), (100vw - var(--container)) / 2);--kv-shift:max(0px, min(var(--kv-left) - 21.47dvh + 24px, 100vw - 87.35dvh - var(--kv-left) - 676px));
+    --kv-avail:calc(100vw - var(--kv-shift) - 87.35dvh - var(--kv-left) - 48px);
+    background:linear-gradient(180deg,#071330 0%,#061534 2%,#051536 4%,#051637 6%,#051738 8%,#05183A 10%,#06193C 12%,#071B40 14%,#091D43 16%,#0A1F46 18%,#0B2048 20%,#0C224A 22%,#0E244C 24%,#10264F 26%,#112751 28%,#132A54 30%,#142B55 32%,#182D59 34%,#1A2F5C 36%,#1D315E 38%,#1F335F 40%,#223461 42%,#263662 44%,#283662 46%,#2C3863 48%,#2E3963 49%,#303962 50%,#313962 51%,#343960 52%,#363A60 53%,#383A5F 54%,#3B395B 56%,#3B3556 58%,#373051 60%,#2F294A 62%,#081531 64%,#091836 66%,#081835 68%,#091835 70%,#071632 72%,#071631 74%,#061530 76%,#05132C 78%,#041129 80%,#041029 82%,#041028 84%,#040F27 86%,#040E26 88%,#050C23 90%,#040B22 92%,#040A21 94%,#03091F 96%,#02091D 98%,#030A1D 100%) left/50% 100% no-repeat,
+      linear-gradient(180deg,#3E4C83 0%,#454F86 2%,#4E538B 4%,#55578F 6%,#5B5C94 8%,#70619A 10%,#78659C 12%,#826AA0 14%,#6D6CA5 16%,#6C71A8 18%,#7478AE 20%,#7A7DB2 22%,#8283B6 24%,#8E87BA 26%,#998EBF 28%,#A192C0 30%,#A799C4 32%,#BE9BC0 34%,#BCA5C7 36%,#C3A8C7 38%,#DCACBF 40%,#D9B9CE 42%,#D6BDD0 44%,#D9C3D2 46%,#E1C6D0 48%,#E3C9D2 49%,#E5CCD2 50%,#E6CACF 51%,#E7C6C8 52%,#E8BFC1 53%,#EBCAC6 54%,#F0CABF 56%,#F2C6B6 58%,#EDB3A5 60%,#E49F97 62%,#7C6587 64%,#74648B 66%,#776B90 68%,#625F88 70%,#5D5C84 72%,#4C507B 74%,#444B74 76%,#424A74 78%,#3C4770 80%,#37426C 82%,#343E68 84%,#2E3963 86%,#27345C 88%,#233159 90%,#1F2D54 92%,#1B2A50 94%,#17274C 96%,#112145 98%,#0D1E42 100%) right/50% 100% no-repeat}
+  .hero__media picture{right:var(--kv-shift)}
+  .hero__media img{-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 12%,#000 91%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0%,#000 12%,#000 91%,transparent 100%)}
+}
+
+/* v0.50 · Hero (màn hình rộng): dải màu nối hai bên KV chuyển từ nền .hero sang lớp ảnh .hero__media và hiện dần CÙNG ảnh,
+   tránh lúc mới tải trang lộ hai mảng màu đậm/nhạt khi ảnh còn trong suốt */
+@keyframes heroMediaIn{from{opacity:0}to{opacity:1}}
+@keyframes heroKvZoom{from{transform:scale(1.06)}to{transform:scale(1.04)}}
+@media (min-width:1181px) and (min-aspect-ratio:2448/1383){
+  .hero{background:#0A1838}
+  .hero__media{background:linear-gradient(180deg,#071330 0%,#061534 2%,#051536 4%,#051637 6%,#051738 8%,#05183A 10%,#06193C 12%,#071B40 14%,#091D43 16%,#0A1F46 18%,#0B2048 20%,#0C224A 22%,#0E244C 24%,#10264F 26%,#112751 28%,#132A54 30%,#142B55 32%,#182D59 34%,#1A2F5C 36%,#1D315E 38%,#1F335F 40%,#223461 42%,#263662 44%,#283662 46%,#2C3863 48%,#2E3963 49%,#303962 50%,#313962 51%,#343960 52%,#363A60 53%,#383A5F 54%,#3B395B 56%,#3B3556 58%,#373051 60%,#2F294A 62%,#081531 64%,#091836 66%,#081835 68%,#091835 70%,#071632 72%,#071631 74%,#061530 76%,#05132C 78%,#041129 80%,#041029 82%,#041028 84%,#040F27 86%,#040E26 88%,#050C23 90%,#040B22 92%,#040A21 94%,#03091F 96%,#02091D 98%,#030A1D 100%) left/50% 100% no-repeat,
+      linear-gradient(180deg,#3E4C83 0%,#454F86 2%,#4E538B 4%,#55578F 6%,#5B5C94 8%,#70619A 10%,#78659C 12%,#826AA0 14%,#6D6CA5 16%,#6C71A8 18%,#7478AE 20%,#7A7DB2 22%,#8283B6 24%,#8E87BA 26%,#998EBF 28%,#A192C0 30%,#A799C4 32%,#BE9BC0 34%,#BCA5C7 36%,#C3A8C7 38%,#DCACBF 40%,#D9B9CE 42%,#D6BDD0 44%,#D9C3D2 46%,#E1C6D0 48%,#E3C9D2 49%,#E5CCD2 50%,#E6CACF 51%,#E7C6C8 52%,#E8BFC1 53%,#EBCAC6 54%,#F0CABF 56%,#F2C6B6 58%,#EDB3A5 60%,#E49F97 62%,#7C6587 64%,#74648B 66%,#776B90 68%,#625F88 70%,#5D5C84 72%,#4C507B 74%,#444B74 76%,#424A74 78%,#3C4770 80%,#37426C 82%,#343E68 84%,#2E3963 86%,#27345C 88%,#233159 90%,#1F2D54 92%,#1B2A50 94%,#17274C 96%,#112145 98%,#0D1E42 100%) right/50% 100% no-repeat;animation:heroMediaIn 1.6s cubic-bezier(.22,1,.36,1) both}
+  .hero__media img{animation:heroKvZoom 2.4s cubic-bezier(.22,1,.36,1) both}
+}
+@media (min-width:1181px) and (min-aspect-ratio:2448/1383) and (prefers-reduced-motion:reduce){.hero__media,.hero__media img{animation:none}}
