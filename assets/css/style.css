@@ -2147,3 +2147,56 @@ p,li,small{text-wrap:pretty}
 .citem__note{display:block;margin-top:4px;font-size:.875rem;color:var(--text-3)}
 .citem .citem__note a,.citem--hl .citem__note a{display:inline;margin:0;font-size:.875rem;font-weight:600;color:var(--text-2)}
 .citem .citem__note a:hover{color:var(--vtb-rose)}
+
+/* ===== v0.44 · Hero theo KV FINAL: ảnh nền full, logo + tagline gõ lại bằng SVN-Aptima, bố cục như KV ===== */
+@font-face{font-family:"SVN-Aptima";src:url("../fonts/SVN-Aptima-Regular.woff2") format("woff2");font-weight:400;font-display:swap}
+.hero::before{background:linear-gradient(0deg,#0A1838 0%,rgba(10,24,56,.5) 9%,rgba(10,24,56,0) 22%)}
+.hero__brand{margin:0}
+.hero__brand img{display:block;width:clamp(150px,15.4vw,236px);height:auto}
+.hero h1.hero__kvtitle{font-family:"SVN-Aptima",var(--font);font-weight:400;text-transform:uppercase;letter-spacing:.18em;line-height:1.26;font-size:clamp(1.625rem,3.28vw,3.25rem);color:#E2C1B8;background:none;-webkit-background-clip:border-box;background-clip:border-box;-webkit-text-fill-color:currentColor;margin:clamp(40px,7.4vh,104px) 0 0;text-shadow:0 2px 24px rgba(10,24,64,.35)}
+.hero h1.hero__kvtitle span{display:block;margin-right:-.18em}
+.hero__tiers{margin:clamp(18px,2.7vw,40px) 0 0;font-family:"SVN-Aptima",var(--font);font-size:clamp(.75rem,1.25vw,1.125rem);letter-spacing:.2em;text-transform:uppercase;color:#E2C1B8;margin-right:-.2em}
+.hero__inner--kv .hero__lead{margin-top:clamp(28px,4vh,44px)}
+@media (min-width:768px){
+  .hero{justify-content:center}
+  .hero__media picture{left:0;width:100%}
+  .hero__media img{object-position:50% 50%;-webkit-mask-image:none;mask-image:none}
+  .hero__inner.hero__inner--kv{width:51.2%;max-width:none;margin:0;padding:calc(var(--barh) + 24px) 24px clamp(110px,12vh,150px);display:flex;flex-direction:column;align-items:center;text-align:center}
+  .hero__inner--kv .hero__lead,.hero__inner--kv .hero__desc{max-width:30rem;margin-left:auto;margin-right:auto}
+  .hero__inner--kv .hero__cta{justify-content:center}
+}
+@media (min-width:768px) and (max-width:1180px){
+  .hero__media img{object-position:28% 50%}
+  .hero__inner.hero__inner--kv{width:52%}
+}
+@media (max-width:767px){
+  .hero__media{height:auto}
+  .hero__media picture{display:block;height:auto}
+  .hero__media img{height:auto;aspect-ratio:900/1090;object-fit:cover;object-position:50% 0}
+  .hero__inner.hero__inner--kv{margin-top:-56px;display:flex;flex-direction:column;align-items:center;text-align:center}
+  .hero__inner--kv .hero__cta{justify-content:center}
+  .hero h1.hero__kvtitle{font-size:1.75rem;letter-spacing:.16em;margin-top:28px}
+  .hero h1.hero__kvtitle span{margin-right:-.16em}
+  .hero__tiers{font-size:.75rem;margin-top:16px}
+}
+html[lang="en"] .hero h1.hero__kvtitle{letter-spacing:.14em}
+
+/* v0.45 · Hero: khối logo + tagline căn lề trái như bản cũ */
+.hero h1.hero__kvtitle span,.hero__tiers{margin-right:0}
+.hero__inner.hero__inner--kv{align-items:flex-start;text-align:left}
+.hero__inner--kv .hero__cta{justify-content:flex-start}
+@media (min-width:768px){
+  .hero__inner.hero__inner--kv{width:min(100% - 2*var(--gutter),var(--container));max-width:none;margin:0 auto;padding-left:0;padding-right:0}
+  .hero__inner--kv > *{max-width:min(560px,46vw)}
+  .hero__inner--kv .hero__lead,.hero__inner--kv .hero__desc{margin-left:0;margin-right:0}
+}
+@media (min-width:1181px){.hero__inner--kv > h1.hero__kvtitle{max-width:none}.hero h1.hero__kvtitle span{white-space:nowrap}}
+
+/* v0.46 · Hero: bỏ logo, tagline to hơn */
+.hero h1.hero__kvtitle{margin-top:0;font-size:clamp(2.125rem,4.3vw,4.375rem);line-height:1.22}
+html[lang="en"] .hero h1.hero__kvtitle{font-size:clamp(1.75rem,3.5vw,3.5rem)}
+@media (max-width:767px){
+  .hero h1.hero__kvtitle{font-size:2.125rem;margin-top:0}
+  html[lang="en"] .hero h1.hero__kvtitle{font-size:1.625rem}
+  .hero__inner.hero__inner--kv{margin-top:-40px}
+}
