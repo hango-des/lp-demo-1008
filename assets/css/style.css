@@ -2289,3 +2289,22 @@ html[lang="en"] .hero h1.hero__kvtitle{font-size:clamp(1.75rem,3.5vw,3.5rem)}
   .conditions__grid .tcard--eli > .tcard__top,.conditions__grid .tcard--eli > .tcard__desc,.conditions__grid .tcard--eli > .tcard__perks{grid-column:1}
   .conditions__grid .tcard--eli > .tcard__rule{grid-column:2;grid-row:1 / span 3;margin-top:0;align-self:start}
 }
+
+/* v0.57 · Mobile Đặc quyền: ảnh minh hoạ thành dải cố định 190px ở đầu thẻ (giữ mặt nhân vật), nội dung ngay bên dưới;
+   thẻ đang chọn quyết định chiều cao (không còn kéo dài theo nhóm dài nhất) → cả cụm gọn ~1 màn hình */
+@media (max-width:767px){
+  .pvx__stage{display:block;position:relative}
+  .pvx__panel{padding:0 12px 12px;justify-content:flex-start;gap:12px}
+  .pvx__panel:not(.is-on){position:absolute;top:0;left:0;right:0;pointer-events:none}
+  .pvx__media{position:relative;inset:auto;z-index:0;height:190px;margin:0 -12px -44px;overflow:hidden}
+  .pvx__media img,#pvx-p5 .pvx__media img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
+  .pvx__media::before,#pvx-p5 .pvx__media::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(7,18,48,0) 45%,rgba(7,18,48,.7) 78%,#071230 100%)}
+  .pvx__cap{position:relative;z-index:2;gap:4px}
+  #pvx-p0 .pvx__media img{object-position:50% 22%}
+  #pvx-p1 .pvx__media img{object-position:45% 35%}
+  #pvx-p2 .pvx__media img{object-position:40% 25%}
+  #pvx-p3 .pvx__media img{object-position:40% 30%}
+  #pvx-p4 .pvx__media img{object-position:50% 25%}
+  #pvx-p5 .pvx__media img{object-position:55% 30%}
+  #pvx-p6 .pvx__media img{object-position:60% 25%}
+}
