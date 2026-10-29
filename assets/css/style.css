@@ -2261,3 +2261,31 @@ html[lang="en"] .hero h1.hero__kvtitle{font-size:clamp(1.75rem,3.5vw,3.5rem)}
   .hero__media img{animation:heroKvZoom 2.4s cubic-bezier(.22,1,.36,1) both}
 }
 @media (min-width:1181px) and (min-aspect-ratio:2448/1383) and (prefers-reduced-motion:reduce){.hero__media,.hero__media img{animation:none}}
+
+/* v0.51 · Tiêu đề Liên hệ ngắt dòng cố định: "Bắt đầu hành trình di sản / cùng VietinBank" (desktop + mobile) */
+#ct-title{max-width:none}
+#ct-title span{display:block;white-space:nowrap}
+@media (max-width:767px){#ct-title{font-size:min(1.75rem,calc((100vw - 90px) / 11.4))}}
+
+/* v0.52 · Feedback 29/10: ngắt dòng có chủ đích + giữ cụm từ tiếng Việt không bị tách dòng (NBSP trong HTML) */
+.br-d{display:none}
+@media (min-width:768px){.br-d{display:inline}}
+.matrix__note:empty{display:none}
+.pvx__pick > i:first-of-type{margin-top:6px}
+
+/* v0.52 · Tablet (768–1180px): thẻ Sản phẩm xếp 1 cột, chữ trái + thẻ phải cho dễ đọc */
+@media (min-width:768px) and (max-width:1180px){
+  .products .cards{grid-template-columns:1fr;gap:16px}
+  .ccard{grid-template-columns:1fr minmax(200px,.75fr);min-height:0;padding:32px 36px}
+  .ccard__txt{max-width:440px}
+  .ccard--inf .ccard__art img{height:210px}
+  .ccard--sig .ccard__art img{max-width:260px}
+}
+/* Tablet: Điều kiện 2 thẻ trên cao bằng nhau; thẻ Elite trải ngang chia 2 cột (quyền lợi | điều kiện) */
+@media (min-width:768px) and (max-width:1180px){
+  .conditions__grid{align-items:stretch}
+  .conditions__grid .tcard--plat,.conditions__grid .tcard--dia{margin-top:0;transform:none}
+  .conditions__grid .tcard--eli{grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr;column-gap:32px;align-content:start}
+  .conditions__grid .tcard--eli > .tcard__top,.conditions__grid .tcard--eli > .tcard__desc,.conditions__grid .tcard--eli > .tcard__perks{grid-column:1}
+  .conditions__grid .tcard--eli > .tcard__rule{grid-column:2;grid-row:1 / span 3;margin-top:0;align-self:start}
+}
