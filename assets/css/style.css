@@ -2308,3 +2308,46 @@ html[lang="en"] .hero h1.hero__kvtitle{font-size:clamp(1.75rem,3.5vw,3.5rem)}
   #pvx-p5 .pvx__media img{object-position:55% 30%}
   #pvx-p6 .pvx__media img{object-position:60% 25%}
 }
+
+/* =====================================================================
+   v0.59 · Màu 3 hạng theo mã của đối tác (02/11)
+   Platinum #687798 (xanh xám) · Diamond #E3E6EA (trắng xanh) · Elite #D5AE95 (nâu)
+   Mỗi hạng có 5 tông: hi (sáng nhất) · lt (sáng) · base (mã gốc) · dk (đậm) · tint (phủ nền)
+   --tc là màu chữ/điểm nhấn trên nền navy: Platinum dùng bản sáng hơn của mã gốc để đủ tương phản.
+   ===================================================================== */
+:root{
+  --plat-hi:#DDE2EC;--plat-lt:#A9B4CC;--plat:#687798;--plat-dk:#3E4A68;--plat-tc:#9DA9C5;
+  --dia-hi:#FFFFFF;--dia-lt:#F1F3F6;--dia:#E3E6EA;--dia-dk:#9AA2AF;--dia-tint:#8E97A6;
+  --eli-hi:#F6E8DE;--eli-lt:#E6C7B2;--eli:#D5AE95;--eli-dk:#9C7259;--eli-tint:#8E644B;
+  --mat-plat:linear-gradient(135deg,#DDE2EC 0%,#A9B4CC 28%,#687798 52%,#C3CCDD 72%,#56638A 100%);
+  --mat-dia:linear-gradient(135deg,#FFFFFF 0%,#EEF0F3 28%,#BCC2CC 52%,#F8F9FA 72%,#A7AEBA 100%);
+  --mat-eli:linear-gradient(135deg,#F6E8DE 0%,#E6C7B2 28%,#B58B70 52%,#EED6C6 74%,#9C7259 100%);
+}
+/* Hành trình: thẻ, popup, mốc */
+.step,.step.step--plat,.step-pop,.step-pop.step--plat{--tc:var(--plat-tc);--tint:var(--plat);--g1:var(--plat-hi);--g2:#56638A;--g3:var(--plat-lt)}
+.step.step--dia,.step-pop.step--dia{--tc:var(--dia);--tint:var(--dia-tint);--g1:var(--dia-hi);--g2:var(--dia-dk);--g3:var(--dia)}
+.step.step--eli,.step-pop.step--eli{--tc:var(--eli);--tint:var(--eli-tint);--g1:var(--eli-hi);--g2:var(--eli-dk);--g3:var(--eli)}
+.anode,.anode.anode--plat{--tc:var(--plat-lt)}
+.anode.anode--dia{--tc:var(--dia)}
+.anode.anode--eli{--tc:var(--eli)}
+.ascend::before{background:linear-gradient(180deg,color-mix(in srgb,var(--plat-lt) 70%,transparent),var(--dia) 50%,var(--eli))}
+/* Đặc quyền: 3 ô hạng */
+.pvx__tier.pvx__tier--plat{--tc:var(--plat-tc);--tline:rgba(169,180,204,.8);background:linear-gradient(180deg,rgba(104,119,152,.58) 0%,rgba(104,119,152,0) 100%)}
+.pvx__tier.pvx__tier--dia{--tc:var(--dia);--tline:rgba(227,230,234,.85);background:linear-gradient(180deg,rgba(154,162,175,.46) 0%,rgba(154,162,175,0) 100%)}
+.pvx__tier.pvx__tier--eli{--tc:var(--eli);--tline:rgba(213,174,149,.85);background:linear-gradient(180deg,rgba(156,114,89,.6) 0%,rgba(156,114,89,0) 100%)}
+.pvx__tier--plat b{color:#C3CCDD}
+.pvx__tier--dia b{color:var(--dia)}
+.pvx__tier--eli b{color:var(--eli-lt)}
+.pvx__tier--plat .pvx__v i::before{background:var(--plat-lt)}
+.pvx__tier--dia .pvx__v i::before{background:var(--dia)}
+.pvx__tier--eli .pvx__v i::before{background:var(--eli)}
+/* Emblem hạng (Đặc quyền, Điều kiện) */
+.tcard--plat .emblem,.cmp__tier--plat .emblem,.pvx__tier--plat .emblem{--tc:var(--plat-lt);background:radial-gradient(110% 80% at 25% 8%,rgba(255,255,255,.85) 0%,rgba(255,255,255,0) 50%),radial-gradient(90% 70% at 80% 100%,rgba(221,226,236,.9) 0%,rgba(221,226,236,0) 55%),#8F9CBA}
+.tcard--dia .emblem,.cmp__tier--dia .emblem,.pvx__tier--dia .emblem{--tc:var(--dia);background:radial-gradient(110% 80% at 25% 8%,#FFFFFF 0%,rgba(255,255,255,0) 50%),radial-gradient(90% 70% at 80% 100%,#FFFFFF 0%,rgba(255,255,255,0) 55%),#DCE0E6}
+.tcard--eli .emblem,.cmp__tier--eli .emblem,.pvx__tier--eli .emblem{--tc:var(--eli);background:linear-gradient(180deg,#F8EDE5 0%,#E8CBB7 28%,#C49A7F 56%,#E2C0A9 82%,#F6E8DE 100%)}
+/* Điều kiện: thẻ hạng */
+.tcard.tcard--plat{--tc:#C3CCDD;--tint:rgba(104,119,152,.1);--tline:rgba(169,180,204,.22);--num:linear-gradient(180deg,#FFFFFF 0%,#DDE2EC 40%,#7E8BAA 54%,#EEF1F6 80%,#A9B4CC 100%);box-shadow:inset 0 0 0 1px var(--tline),inset 0 -60px 100px -70px rgba(104,119,152,.3)}
+.tcard.tcard--dia{--tc:var(--dia);--tint:rgba(227,230,234,.05);--tline:rgba(227,230,234,.22);--num:linear-gradient(180deg,#FFFFFF 0%,#F1F3F6 40%,#AEB5C0 54%,#FAFBFC 80%,#D3D7DE 100%);box-shadow:inset 0 0 0 1px var(--tline),inset 0 -60px 100px -70px rgba(227,230,234,.14)}
+.tcard.tcard--eli{--tc:var(--eli);--tint:rgba(156,114,89,.12);--tline:rgba(213,174,149,.3);--num:linear-gradient(180deg,#FFF6EF 0%,#E8CBB7 40%,#B58B70 54%,#F6E8DE 80%,#D5AE95 100%);box-shadow:inset 0 0 0 1px var(--tline),inset 0 -60px 100px -70px rgba(156,114,89,.28)}
+.tcard--eli::after{background:conic-gradient(from var(--ang),transparent 0deg,transparent 200deg,#F6E8DE 300deg,#9C7259 340deg,transparent 360deg)}
+html.figma-static .tcard--eli{box-shadow:inset 0 0 0 1px rgba(213,174,149,.4)}

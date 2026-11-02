@@ -436,7 +436,7 @@ document.querySelectorAll('main > section, .hero, footer, .silk').forEach(s=>io.
 
 /* v0.30 · Chèn viền SVG "tô sáng dần" cho 3 thẻ hạng */
 (()=>{const steps=document.querySelectorAll('.ascend .step');const NS='http://www.w3.org/2000/svg';
-const pal={plat:['#FFFFFF','#E6EAF0','#9AA4B4'],dia:['#F4FEFF','#C2F0F1','#4FB3BC'],eli:['#FFF4F0','#F0C3BA','#B5635F']};
+const pal={plat:['#DDE2EC','#A9B4CC','#687798'],dia:['#FFFFFF','#E3E6EA','#9AA2AF'],eli:['#F6E8DE','#D5AE95','#9C7259']};/* v0.59 màu hạng mới */
 steps.forEach((s,i)=>{const f=s.querySelector('.step__frame');if(!f||f.querySelector('.step__trace'))return;
   const k=s.classList.contains('step--eli')?'eli':s.classList.contains('step--dia')?'dia':'plat',c=pal[k],id='trg'+i;
   const svg=document.createElementNS(NS,'svg');svg.setAttribute('class','step__trace');svg.setAttribute('aria-hidden','true');
