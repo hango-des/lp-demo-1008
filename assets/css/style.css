@@ -2351,3 +2351,24 @@ html[lang="en"] .hero h1.hero__kvtitle{font-size:clamp(1.75rem,3.5vw,3.5rem)}
 .tcard.tcard--eli{--tc:var(--eli);--tint:rgba(156,114,89,.12);--tline:rgba(213,174,149,.3);--num:linear-gradient(180deg,#FFF6EF 0%,#E8CBB7 40%,#B58B70 54%,#F6E8DE 80%,#D5AE95 100%);box-shadow:inset 0 0 0 1px var(--tline),inset 0 -60px 100px -70px rgba(156,114,89,.28)}
 .tcard--eli::after{background:conic-gradient(from var(--ang),transparent 0deg,transparent 200deg,#F6E8DE 300deg,#9C7259 340deg,transparent 360deg)}
 html.figma-static .tcard--eli{box-shadow:inset 0 0 0 1px rgba(213,174,149,.4)}
+
+/* =====================================================================
+   v0.60 · Diamond sáng hơn để tách bạch với Platinum (04/11)
+   Diamond giữ gốc #E3E6EA nhưng đẩy toàn bộ shading lên tông trắng sáng:
+   hi #FFFFFF · lt #F6F7F9 · base hiển thị #EEF0F3 · dk #BCC2CC · tint #C9CED6
+   ===================================================================== */
+:root{
+  --dia-hi:#FFFFFF;--dia-lt:#F6F7F9;--dia-on:#EEF0F3;--dia-dk:#BCC2CC;--dia-tint:#C9CED6;
+  --mat-dia:linear-gradient(135deg,#FFFFFF 0%,#F6F7F9 28%,#D3D8DF 52%,#FFFFFF 72%,#C3C9D2 100%);
+}
+.step.step--dia,.step-pop.step--dia{--tc:var(--dia-on);--tint:var(--dia-tint);--g1:#FFFFFF;--g2:var(--dia-dk);--g3:var(--dia-lt)}
+.anode.anode--dia{--tc:#F6F7F9}
+.ascend::before{background:linear-gradient(180deg,color-mix(in srgb,var(--plat-lt) 70%,transparent),#F6F7F9 50%,var(--eli))}
+.pvx__tier.pvx__tier--dia{--tc:var(--dia-on);--tline:rgba(255,255,255,.95);background:linear-gradient(180deg,rgba(227,230,234,.36) 0%,rgba(227,230,234,.05) 100%)}
+.pvx__tier--dia b{color:#FFFFFF}
+.pvx__tier--dia .pvx__v i::before{background:#FFFFFF}
+.tcard--dia .emblem,.cmp__tier--dia .emblem,.pvx__tier--dia .emblem{--tc:#FFFFFF;background:radial-gradient(110% 80% at 25% 8%,#FFFFFF 0%,rgba(255,255,255,0) 55%),radial-gradient(90% 70% at 80% 100%,#FFFFFF 0%,rgba(255,255,255,0) 60%),#EEF0F3}
+.tcard.tcard--dia{--tc:var(--dia-on);--tint:rgba(227,230,234,.09);--tline:rgba(238,240,243,.34);--num:linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 40%,#C9CED6 54%,#FFFFFF 80%,#E3E6EA 100%);box-shadow:inset 0 0 0 1px var(--tline),inset 0 -60px 100px -70px rgba(238,240,243,.26)}
+.pvx__tier.pvx__tier--dia{background:linear-gradient(180deg,rgba(240,242,245,.48) 0%,rgba(227,230,234,.16) 55%,rgba(227,230,234,.06) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 0 0 1px rgba(255,255,255,.22)}
+.pvx__tier--dia .pvx__v{text-shadow:0 1px 2px rgba(7,18,48,.35)}
+.tcard.tcard--dia{--tint:rgba(238,240,243,.12);--tline:rgba(255,255,255,.45);box-shadow:inset 0 0 0 1px var(--tline),inset 0 -60px 100px -60px rgba(255,255,255,.3),inset 0 80px 120px -90px rgba(255,255,255,.22)}
