@@ -2372,3 +2372,156 @@ html.figma-static .tcard--eli{box-shadow:inset 0 0 0 1px rgba(213,174,149,.4)}
 .pvx__tier.pvx__tier--dia{background:linear-gradient(180deg,rgba(240,242,245,.48) 0%,rgba(227,230,234,.16) 55%,rgba(227,230,234,.06) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 0 0 1px rgba(255,255,255,.22)}
 .pvx__tier--dia .pvx__v{text-shadow:0 1px 2px rgba(7,18,48,.35)}
 .tcard.tcard--dia{--tint:rgba(238,240,243,.12);--tline:rgba(255,255,255,.45);box-shadow:inset 0 0 0 1px var(--tline),inset 0 -60px 100px -60px rgba(255,255,255,.3),inset 0 80px 120px -90px rgba(255,255,255,.22)}
+
+/* =====================================================================
+   v0.61 · Review R1 của đối tác (12/11)
+   ===================================================================== */
+/* 1. Bỏ dải vát rose gold ở đáy hero và đỉnh footer */
+.hero .facet,.site-footer .facet{display:none!important}
+/* 2. Hero desktop: phủ lớp navy mờ + blur nhẹ vùng chữ để đường chân trời không cắt qua chữ */
+@media (min-width:1181px){
+  .hero__media::after{content:"";position:absolute;inset:0 auto 0 0;width:min(62%,980px);z-index:1;pointer-events:none;
+    background:linear-gradient(180deg,rgba(9,22,56,0) 36%,rgba(9,22,56,.6) 48%,rgba(9,22,56,.6) 54%,rgba(9,22,56,0) 68%),linear-gradient(90deg,rgba(9,22,56,.8) 0%,rgba(9,22,56,.62) 45%,rgba(9,22,56,0) 100%);
+    -webkit-backdrop-filter:blur(32px);backdrop-filter:blur(32px);
+    -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 55%,transparent 100%);mask-image:linear-gradient(90deg,#000 0%,#000 55%,transparent 100%)}
+}
+/* 3. Nút chính theo gradient rose gold của logo (guideline: #E9C5BB đáy → #A56D6A đỉnh, gốc #D3A097) */
+.btn--rose{background:linear-gradient(0deg,#E9C5BB 0%,#D3A097 52%,#B27C74 100%);color:#0A1838}
+.btn--rose:hover{background:linear-gradient(0deg,#EFD0C7 0%,#D9A89F 52%,#BB867E 100%)}
+/* 4. Footer: bỏ biểu tượng đồng tiền dạng nét */
+.coin-mark--foot{display:none!important}
+.site-footer{padding-top:clamp(56px,6vw,80px);border-top:1px solid rgba(241,243,244,.08)}
+/* 5. Điều kiện: biểu tượng đồng tiền hiển thị trọn vẹn, canh theo mép phải container */
+.conditions > .coin-mark{width:min(34vw,480px);right:max(var(--gutter),calc((100vw - var(--container)) / 2));top:clamp(40px,5vw,80px);stroke:rgba(241,243,244,.06)}
+@media (max-width:767px){.conditions > .coin-mark{width:min(72vw,300px);right:var(--gutter);top:24px}}
+@media (min-width:1181px) and (min-aspect-ratio:2448/1383){
+  /* màn rộng: dải màu nối bên trái KV (nền .hero__media) có đường chân trời → chép nền sang ::before rồi blur mạnh */
+  .hero__media::before{content:"";position:absolute;inset:-80px auto -80px -80px;width:calc(100% - 87.35dvh - var(--kv-shift,0px) + 200px);background:inherit;filter:blur(36px);pointer-events:none}
+}
+/* 6. Hành trình (thẻ mở rộng): pattern chỉ nằm sau cột chữ, mờ hết trước vùng nhân vật */
+@media (min-width:768px){
+  /* v0.64: trả về như v0.58 (pattern 520px phủ qua mép ảnh để không lộ vết cắt), xem khối v0.64 cuối file */
+}
+/* 7. Đặc quyền (desktop/tablet): ảnh chỉ chiếm phần trên thẻ, tan dần về navy; chữ + box hạng nằm dưới, không đè lên mặt nhân vật */
+@media (min-width:768px){
+  .pvx__media{background:#071230}
+  .pvx__media img,#pvx-p5 .pvx__media img{top:0!important;height:60%!important;object-fit:cover;
+    -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 62%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 62%,transparent 100%)}
+  #pvx-p0 .pvx__media img{object-position:50% 26%}
+  #pvx-p1 .pvx__media img{object-position:50% 30%}
+  #pvx-p2 .pvx__media img{object-position:45% 30%}
+  #pvx-p3 .pvx__media img{object-position:50% 55%}
+  #pvx-p4 .pvx__media img{object-position:50% 20%}
+  #pvx-p5 .pvx__media img{object-position:50% 45%}
+  #pvx-p6 .pvx__media img{object-position:50% 45%}
+}
+@media (min-width:768px) and (max-width:1180px){
+  .pvx__media img,#pvx-p5 .pvx__media img{height:74%!important}
+  #pvx-p0 .pvx__media img{object-position:50% 18%}
+  #pvx-p1 .pvx__media img{object-position:50% 52%}
+  #pvx-p2 .pvx__media img{object-position:45% 30%}
+  #pvx-p4 .pvx__media img{object-position:50% 25%}
+  #pvx-p6 .pvx__media img{object-position:50% 50%}
+}
+@media (min-width:768px) and (max-width:1180px){#pvx-p0 .pvx__media img{height:62%!important;object-position:50% 30%}}
+/* 8. Sản phẩm: 2 thẻ Visa cùng hướng, cùng góc nghiêng 30° (Infinite là thẻ dọc → quay 60° để cạnh dài song song với Signature quay −30°) */
+.ccard--inf .ccard__art img,.ccard--inf:hover .ccard__art img{height:230px!important;width:auto!important;max-width:none!important;transform:rotate(60deg)!important;filter:drop-shadow(0 18px 28px rgba(0,0,0,.45))}
+.ccard--sig .ccard__art img,.ccard--sig:hover .ccard__art img{width:230px!important;height:auto!important;max-width:none!important;transform:rotate(-30deg)!important;filter:drop-shadow(0 18px 28px rgba(0,0,0,.45))}
+@media (max-width:767px){
+  .ccard--inf .ccard__art img,.ccard--inf:hover .ccard__art img{height:200px!important}
+  .ccard--sig .ccard__art img,.ccard--sig:hover .ccard__art img{width:200px!important}
+}
+/* 9. Liên hệ: ảnh KV final phủ lớp xanh mờ; bỏ đường cong (silk) phía dưới */
+.contact .silk--b{display:none!important}
+.contact__hero .contact__bg,.contact__bg{inset:0!important;-webkit-mask-image:none!important;mask-image:none!important;opacity:1!important}
+.contact__bg img{mix-blend-mode:normal!important;opacity:1!important;filter:saturate(.85)!important;object-position:78% 50%!important}
+.contact__bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,26,64,.96) 0%,rgba(10,26,64,.86) 36%,rgba(10,26,64,.5) 68%,rgba(10,26,64,.42) 100%),linear-gradient(0deg,rgba(0,47,84,.45),rgba(0,47,84,.45))}
+@media (max-width:767px){.contact__bg img{object-position:62% 40%!important}.contact__bg::after{background:linear-gradient(180deg,rgba(10,26,64,.35) 0%,rgba(10,26,64,.85) 60%,rgba(10,26,64,.96) 100%),linear-gradient(0deg,rgba(0,47,84,.4),rgba(0,47,84,.4))}}
+/* 10. Điều kiện: thẻ trung tính, màu hạng chỉ ở emblem, tên hạng và số */
+.tcard.tcard--plat,.tcard.tcard--dia,.tcard.tcard--eli{--tint:rgba(241,243,244,.035);--tline:rgba(241,243,244,.14);box-shadow:inset 0 0 0 1px var(--tline)!important}
+.tcard__glow{background:conic-gradient(from var(--ang),transparent 0deg,transparent 220deg,rgba(241,243,244,.18) 290deg,rgba(255,255,255,.55) 330deg,rgba(241,243,244,.18) 350deg,transparent 360deg)!important;opacity:.6!important}
+.tcard--eli::after{background:conic-gradient(from var(--ang),transparent 0deg,transparent 220deg,rgba(241,243,244,.3) 300deg,rgba(255,255,255,.7) 335deg,transparent 360deg)!important}
+/* v0.62 · 2 thẻ Visa nằm ngang, không nghiêng (Infinite là thẻ dọc → xoay −90° thành ngang) */
+.ccard--inf .ccard__art img,.ccard--inf:hover .ccard__art img{transform:rotate(-90deg)!important}
+.ccard--sig .ccard__art img,.ccard--sig:hover .ccard__art img{transform:none!important}
+
+/* =====================================================================
+   v0.63 · 3 hạng dùng chung bảng màu rose gold (12/11) · nền box Liên hệ tiệp nền landing
+   Rose: hi #F6E4DE · lt #E9C5BB · base #D3A097 · dk #A56D6A · tint #683431
+   ===================================================================== */
+:root{
+  --plat-hi:#F6E4DE;--plat-lt:#E9C5BB;--plat:#D3A097;--plat-dk:#A56D6A;--plat-tc:#E9C5BB;
+  --dia-hi:#F6E4DE;--dia-lt:#E9C5BB;--dia:#D3A097;--dia-on:#E9C5BB;--dia-dk:#A56D6A;--dia-tint:#683431;
+  --eli-hi:#F6E4DE;--eli-lt:#E9C5BB;--eli:#D3A097;--eli-dk:#A56D6A;--eli-tint:#683431;
+  --mat-plat:linear-gradient(135deg,#F6E4DE 0%,#E9C5BB 28%,#C38E86 52%,#EED3CA 74%,#A56D6A 100%);
+  --mat-dia:var(--mat-plat);--mat-eli:var(--mat-plat);
+}
+.step,.step.step--plat,.step.step--dia,.step.step--eli,.step-pop,.step-pop.step--plat,.step-pop.step--dia,.step-pop.step--eli{--tc:#E9C5BB;--tint:#683431;--g1:#F6E4DE;--g2:#A56D6A;--g3:#E9C5BB}
+.anode,.anode.anode--plat,.anode.anode--dia,.anode.anode--eli{--tc:#E9C5BB}
+.ascend::before{background:linear-gradient(180deg,rgba(233,197,187,.55),#E9C5BB 50%,#D3A097)}
+.pvx__tier.pvx__tier--plat,.pvx__tier.pvx__tier--dia,.pvx__tier.pvx__tier--eli{--tc:#E9C5BB;--tline:rgba(233,197,187,.75);background:linear-gradient(180deg,rgba(165,109,106,.5) 0%,rgba(165,109,106,0) 100%);box-shadow:none}
+.pvx__tier--dia .pvx__v{text-shadow:none}
+.pvx__tier--plat b,.pvx__tier--dia b,.pvx__tier--eli b{color:#F6E4DE}
+.pvx__tier--plat .pvx__v i::before,.pvx__tier--dia .pvx__v i::before,.pvx__tier--eli .pvx__v i::before{background:#E9C5BB}
+.tcard--plat .emblem,.tcard--dia .emblem,.tcard--eli .emblem,.cmp__tier--plat .emblem,.cmp__tier--dia .emblem,.cmp__tier--eli .emblem,.pvx__tier--plat .emblem,.pvx__tier--dia .emblem,.pvx__tier--eli .emblem{--tc:#E9C5BB;background:linear-gradient(0deg,#E9C5BB 0%,#D3A097 52%,#A56D6A 100%)}
+.tcard.tcard--plat,.tcard.tcard--dia,.tcard.tcard--eli{--tc:#E9C5BB;--num:linear-gradient(180deg,#FFF4EF 0%,#F6E4DE 38%,#C38E86 54%,#F6E4DE 80%,#E9C5BB 100%)}
+html.figma-static .tcard--eli{box-shadow:inset 0 0 0 1px rgba(241,243,244,.14)}
+/* Liên hệ: khung nội dung cùng màu nền landing (#0A1A3E), bỏ các mảng tối hơn */
+.contact__panel{background:#0A1A3E!important;box-shadow:inset 0 0 0 1px rgba(211,160,151,.18)!important}
+.contact__panel > .contact__grid,.contact__panel > .social{background:transparent!important}
+.contact__panel .app{background:rgba(241,243,244,.03)!important;box-shadow:inset 0 0 0 1px rgba(241,243,244,.08)!important}
+.contact__bg::after{background:linear-gradient(90deg,rgba(10,26,62,.96) 0%,rgba(10,26,62,.86) 36%,rgba(10,26,62,.5) 68%,rgba(10,26,62,.42) 100%),linear-gradient(0deg,rgba(0,47,84,.45),rgba(0,47,84,.45))!important}
+@media (max-width:767px){.contact__bg::after{background:linear-gradient(180deg,rgba(10,26,62,.35) 0%,rgba(10,26,62,.85) 60%,rgba(10,26,62,1) 100%),linear-gradient(0deg,rgba(0,47,84,.4),rgba(0,47,84,.4))!important}}
+/* Icon hạng chính thức (bản rose gold, active, circle) thay emblem cũ */
+.emblem.emblem--off{background:none!important;padding:0;color:inherit;box-shadow:0 0 0 1px rgba(233,197,187,.35),0 0 22px -6px rgba(211,160,151,.55),0 10px 24px -12px rgba(0,0,0,.6)!important}
+.emblem.emblem--off svg{width:100%;height:100%;display:block;border-radius:50%}
+.pvx__tier.is-none .emblem.emblem--off{opacity:.55}
+
+/* =====================================================================
+   v0.64 · chỉnh theo Hà 12/11 tối
+   ===================================================================== */
+/* 1. Hero → section kế: dải chuyển màu mượt ở đáy hero (trước đây dải vát rose che chỗ nối) */
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:clamp(160px,22vh,260px);z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(10,26,62,0) 0%,rgba(10,26,62,.55) 45%,rgba(10,26,62,.9) 78%,#0A1A3E 100%)}
+/* 2. Hero desktop: lớp navy che vùng chữ dày hơn, phủ hết đường chân trời phía sau chữ */
+@media (min-width:1181px){
+  .hero__media::after{width:min(70%,1100px);
+    background:linear-gradient(90deg,rgba(9,22,56,.9) 0%,rgba(9,22,56,.82) 40%,rgba(9,22,56,.5) 65%,rgba(9,22,56,0) 100%);
+    -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 60%,transparent 100%);mask-image:linear-gradient(90deg,#000 0%,#000 60%,transparent 100%)}
+}
+@media (min-width:768px) and (max-width:1180px){
+  .hero__media::after{content:"";position:absolute;left:0;right:0;bottom:0;height:45%;pointer-events:none;background:linear-gradient(180deg,rgba(9,22,56,0),rgba(9,22,56,.85))}
+}
+/* 3. Bỏ hẳn biểu tượng đồng tiền dạng nét (Điều kiện) */
+.coin-mark{display:none!important}
+/* 4. Liên hệ: lớp phủ trên KV nhạt bớt */
+.contact__bg::after{background:linear-gradient(90deg,rgba(10,26,62,.92) 0%,rgba(10,26,62,.7) 34%,rgba(10,26,62,.22) 66%,rgba(10,26,62,.12) 100%),linear-gradient(0deg,rgba(0,47,84,.18),rgba(0,47,84,.18))!important}
+@media (max-width:767px){.contact__bg::after{background:linear-gradient(180deg,rgba(10,26,62,.1) 0%,rgba(10,26,62,.7) 60%,#0A1A3E 100%)!important}}
+/* 5. Hành trình (thẻ mở rộng): pattern nhạt, phủ qua mép ảnh rồi tan dần; ảnh có fade mép trái nên không còn vết cắt */
+@media (min-width:768px){
+  .step__body::before{width:520px;
+    background:linear-gradient(rgba(4,10,30,.62),rgba(4,10,30,.62)),var(--pat) left center/cover no-repeat,#050C24;
+    -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 55%,transparent 100%);mask-image:linear-gradient(90deg,#000 0%,#000 55%,transparent 100%)}
+  .step.is-active .step__media::after{background:linear-gradient(90deg,#060F2A 0%,rgba(6,15,42,.75) 10%,rgba(6,15,42,.25) 24%,rgba(6,15,42,0) 38%),linear-gradient(180deg,rgba(6,18,47,0) 40%,rgba(6,18,47,.78) 66%,#07142F 100%)!important}
+}
+@media (min-width:768px){.hero__media::after{display:block!important}}
+
+/* =====================================================================
+   v0.65 · Hành trình (thẻ mở rộng): hoạ tiết nằm DƯỚI ảnh nhân vật
+   - pattern chuyển từ .step__body::before (lớp trên ảnh) sang .step__frame::before (lớp dưới ảnh)
+   - ảnh nhân vật fade mép trái bằng mask → hoạ tiết chỉ lộ ở phần nền trống, không bao giờ đè lên người
+   ===================================================================== */
+@media (min-width:768px){
+  .step__frame::before{content:"";position:absolute;inset:0 auto 0 0;width:62%;z-index:0;pointer-events:none;
+    background:linear-gradient(rgba(4,10,30,.55),rgba(4,10,30,.55)),var(--pat) left center/cover no-repeat,#050C24;
+    -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 60%,transparent 100%);mask-image:linear-gradient(90deg,#000 0%,#000 60%,transparent 100%);
+    opacity:0;transition:opacity var(--T,.95s) var(--E,ease)}
+  .step.is-active .step__frame::before{opacity:1}
+  .step.is-active .step__media{z-index:1}
+  .step.is-active .step__media img{-webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.35) 12%,#000 34%);mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.35) 12%,#000 34%)}
+  .step.is-active .step__media::before{-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 34%);mask-image:linear-gradient(90deg,transparent 0%,#000 34%)}
+  .step.is-active .step__media::after{background:linear-gradient(180deg,rgba(6,18,47,0) 40%,rgba(6,18,47,.78) 66%,#07142F 100%)!important;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 34%);mask-image:linear-gradient(90deg,transparent 0%,#000 34%)}
+  /* lớp dưới chữ: chỉ còn nền tối nhẹ, không còn hoạ tiết */
+  .step__body::before{background:linear-gradient(90deg,rgba(5,12,36,.5) 0%,rgba(5,12,36,.3) 60%,rgba(5,12,36,0) 100%)!important;-webkit-mask-image:none;mask-image:none}
+}
