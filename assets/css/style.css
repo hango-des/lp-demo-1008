@@ -2525,3 +2525,90 @@ html.figma-static .tcard--eli{box-shadow:inset 0 0 0 1px rgba(241,243,244,.14)}
   /* lớp dưới chữ: chỉ còn nền tối nhẹ, không còn hoạ tiết */
   .step__body::before{background:linear-gradient(90deg,rgba(5,12,36,.5) 0%,rgba(5,12,36,.3) 60%,rgba(5,12,36,0) 100%)!important;-webkit-mask-image:none;mask-image:none}
 }
+
+/* v0.66 · Mobile Hành trình: badge "Trải nghiệm…" không lẹm vào mặt nhân vật
+   ảnh lùi xuống dưới badge (khoảng trống 46px nền navy, ảnh fade lên), badge gọn hơn */
+@media (max-width:767px){
+  .step__frame{background:#0B1C44}
+  .step__media{margin-top:46px;height:224px!important}
+  .step__media img,.step.is-active .step__media img,.ascend.has-active .step:not(.is-active) .step__media img{object-position:50% 6%!important;
+    -webkit-mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.6) 10%,#000 22%);mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.6) 10%,#000 22%)}
+  .step__level{top:12px;height:26px;padding:0 40px 0 14px;font-size:.6875rem}
+}
+
+/* =====================================================================
+   v0.67 · Mobile: ảnh Đặc quyền thấy rõ chủ thể; KV Liên hệ thấy trọn khối kính + đồng tiền
+   ===================================================================== */
+@media (max-width:767px){
+  .pvx__media{height:216px}
+  .pvx__media::before,#pvx-p5 .pvx__media::before{background:linear-gradient(180deg,rgba(7,18,48,0) 60%,rgba(7,18,48,.65) 84%,#071230 100%)}
+  #pvx-p0 .pvx__media img{object-position:50% 28%}
+  #pvx-p1 .pvx__media img{object-position:45% 62%}
+  #pvx-p2 .pvx__media img{object-position:40% 45%}
+  #pvx-p3 .pvx__media img{object-position:45% 88%}
+  #pvx-p4 .pvx__media img{object-position:50% 52%}
+  #pvx-p5 .pvx__media img{object-position:50% 92%}
+  #pvx-p6 .pvx__media img{object-position:60% 72%}
+}
+@media (max-width:767px){
+  .contact__hero{padding-top:250px!important}
+  .contact__bg img{object-position:80% 34%!important}
+  .contact__bg::after{background:linear-gradient(180deg,rgba(10,26,62,.05) 0%,rgba(10,26,62,0) 38%,rgba(10,26,62,.78) 66%,#0A1A3E 100%)!important}
+}
+/* KV Liên hệ: bỏ lớp phủ thừa (.contact__hero::before) để thấy rõ khối kính + đồng tiền */
+.contact__bg img{filter:none!important}
+.contact__hero::before{background:linear-gradient(90deg,rgba(10,26,62,.55) 0%,rgba(10,26,62,.35) 34%,rgba(10,26,62,0) 60%)!important}
+@media (max-width:767px){.contact__hero::before{background:none!important}}
+@media (min-width:768px){
+  .contact__hero{padding-top:clamp(84px,8vw,120px)!important;padding-bottom:clamp(84px,8vw,120px)!important}
+  .contact__bg img{object-position:76% 40%!important}
+}
+@media (min-width:1181px){.contact__bg img{object-position:86% 40%!important}}
+@media (min-width:768px) and (max-width:1180px){.contact__bg img{object-position:100% 40%!important}}
+/* tablet: nút "Kết nối với RM" xuống dưới tiêu đề, không che đồng tiền của KV */
+@media (min-width:768px) and (max-width:1180px){
+  .contact__hero{grid-template-columns:minmax(0,1fr)!important}
+  .contact__hero .contact__intro{grid-column:1!important;grid-row:auto!important;justify-self:start!important;margin-top:20px}
+  .contact__hero .h2{max-width:52%}
+}
+
+/* =====================================================================
+   v0.68 · Desktop Đặc quyền: lộ rõ mặt nhân vật · Banner "Bắt đầu hành trình" thấp hơn, vẫn đủ chủ thể KV
+   ===================================================================== */
+@media (min-width:1181px){
+  .pvx__media::before{background:linear-gradient(180deg,rgba(7,18,48,0) 0%,rgba(7,18,48,0) 34%,rgba(7,18,48,.55) 46%,rgba(7,18,48,.9) 56%,#071230 64%,#071230 100%),linear-gradient(90deg,rgba(7,18,48,.45) 0%,rgba(7,18,48,0) 45%)!important}
+  #pvx-p1 .pvx__media img{object-position:50% 85%}
+  #pvx-p4 .pvx__media img{object-position:50% 68%}
+  #pvx-p5 .pvx__media img{object-position:50% 100%}
+}
+/* Banner Liên hệ (≥768): ảnh KV đặt bên phải, cao 150% khung → thấy trọn khối kính + đồng tiền; nút xuống dưới tiêu đề */
+@media (min-width:768px){
+  .contact__hero{grid-template-columns:minmax(0,1fr)!important;padding-top:clamp(40px,4vw,56px)!important;padding-bottom:clamp(40px,4vw,56px)!important}
+  .contact__hero .contact__intro{grid-column:1!important;grid-row:auto!important;justify-self:start!important;margin-top:20px}
+  .contact__hero .h2{max-width:56%}
+  .contact__bg{overflow:hidden}
+  .contact__bg img{position:absolute!important;top:-21%!important;right:0!important;left:auto!important;height:152%!important;width:auto!important;max-width:none!important;object-fit:fill!important;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 30%);mask-image:linear-gradient(90deg,transparent 0%,#000 30%)}
+  .contact__bg::after{background:linear-gradient(90deg,rgba(10,26,62,.6) 0%,rgba(10,26,62,.2) 40%,rgba(10,26,62,0) 60%)!important}
+  .contact__hero::before{background:none!important}
+}
+/* Mobile: dải KV 190px ở trên, ảnh ngang đầy đủ chủ thể */
+@media (max-width:767px){
+  .contact__hero{padding-top:178px!important}
+  .contact__bg{bottom:auto!important;height:200px!important}
+  .contact__bg img{object-position:66% 45%!important;
+    -webkit-mask-image:linear-gradient(180deg,#000 72%,transparent 100%);mask-image:linear-gradient(180deg,#000 72%,transparent 100%)}
+  .contact__bg::after{background:none!important}
+}
+@media (min-width:768px) and (max-width:1180px){.contact__hero .h2{max-width:48%}.contact__bg img{height:135%!important;top:-14%!important}}
+/* Mobile Hành trình: bỏ khoảng màu dư phía trên ảnh — ảnh phủ kín từ mép trên, badge nằm trên vùng nền (ảnh lấy phần trên rộng hơn) */
+@media (max-width:767px){
+  .step__frame{background:transparent}
+  .step__media{margin-top:0!important;height:270px!important}
+  .step__media img,.step.is-active .step__media img,.ascend.has-active .step:not(.is-active) .step__media img{object-position:50% 0%!important;-webkit-mask-image:none!important;mask-image:none!important}
+}
+/* v0.68b · Mobile Hành trình: ảnh tan mềm vào nền thẻ (không còn đường cắt ở đáy ảnh) */
+@media (max-width:767px){
+  .step__media,.step.is-active .step__media{-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 52%,rgba(0,0,0,.6) 72%,rgba(0,0,0,.2) 88%,transparent 100%)!important;mask-image:linear-gradient(180deg,#000 0%,#000 52%,rgba(0,0,0,.6) 72%,rgba(0,0,0,.2) 88%,transparent 100%)!important}
+  .step__media::after,.step.is-active .step__media::after,.step__media::before{background:none!important}
+}
